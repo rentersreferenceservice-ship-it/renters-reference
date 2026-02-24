@@ -1,0 +1,412 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+
+type Report = {
+  id: string;
+  landlordId: string;
+  date: string; // simple text like "Jan 2026" or "2025"
+  repairSpeed: "Fast" | "Okay" | "Slow";
+  depositReturn: "On time" | "Late" | "Not returned" | "Not sure";
+  note: string; // short story
+};
+
+type Landlord = {
+  id: string;
+  name: string;
+  cityState: string;
+};
+
+const STORAGE_KEY_LANDLORDS = "renters-reference-landlords";
+const STORAGE_KEY_REPORTS = "renters-reference-reports";
+
+export default function Home() {
+  const [showForm, setShowForm] = useState(false);
+  const [landlordName, setLandlordName] = useState("");
+  const [cityState, setCityState] = useState("");
+
+  const [landlords, setLandlords] = useState<Landlord[]>([]);
+  const [reports, setReports] = useState<Report[]>([]);
+const [selectedLandlordId, setSelectedLandlordId] = useState<string | null>(
+  null
+);
+
+const [search, setSearch] = useState("");
+
+  
+  // report form fields
+  const [reportDate, setReportDate] = useState("");
+  const [repairSpeed, setRepairSpeed] = useState<Report["repairSpeed"]>("Okay");
+  const [depositReturn, setDepositReturn] =
+    useState<Report["depositReturn"]>("Not sure");
+  const [note, setNote] = useState("");
+
+  const selectedLandlord = useMemo(() => {
+    return landlords.find((l) => l.id === selectedLandlordId) ?? null;
+  }, [landlords, selectedLandlordId]);
+const filteredLandlords = useMemo(() => {
+  const q = search.trim().toLowerCase();
+  if (!q) return landlords;
+  return landlords.filter(
+    (l) =>
+      l.name.toLowerCase().includes(q) ||
+      l.cityState.toLowerCase().includes(q)
+  );
+}, [landlords, search]);
+
+  const selectedReports = useMemo(() => {
+    if (!selectedLandlordId) return [];
+    return reports.filter((r) => r.landlordId === selectedLandlordId);
+  }, [reports, selectedLandlordId]);
+
+  // LOAD
+  useEffect(() => {
+    const savedLandlords = localStorage.getItem(STORAGE_KEY_LANDLORDS);
+    if (savedLandlords) setLandlords(JSON.parse(savedLandlords));
+
+    const savedReports = localStorage.getItem(STORAGE_KEY_REPORTS);
+    if (savedReports) setReports(JSON.parse(savedReports));
+  }, []);
+
+  // SAVE
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_LANDLORDS, JSON.stringify(landlords));
+  }, [landlords]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(reports));
+  }, [reports]);
+
+  function saveLandlord() {
+    const name = landlordName.trim();
+    const place = cityState.trim();
+
+    if (!name || !place) {
+      alert("Please fill in BOTH: Landlord name and City, State.");
+      return;
+    }
+
+    const newLandlord: Landlord = {
+      id: crypto.randomUUID(),
+      name,
+      cityState: place,
+    };
+
+    setLandlords((prev) => [newLandlord, ...prev]);
+    setLandlordName("");
+    setCityState("");
+    setShowForm(false);
+  }
+
+  function removeLandlord(id: string) {
+    setLandlords((prev) => prev.filter((l) => l.id !== id));
+    setReports((prev) => prev.filter((r) => r.landlordId !== id));
+    if (selectedLandlordId === id) setSelectedLandlordId(null);
+  }
+
+  function openReports(landlordId: string) {
+    setSelectedLandlordId(landlordId);
+    // reset report form
+    setReportDate("");
+    setRepairSpeed("Okay");
+    setDepositReturn("Not sure");
+    setNote("");
+  }
+
+  function saveReport() {
+    if (!selectedLandlordId) return;
+
+    const d = reportDate.trim();
+    const n = note.trim();
+
+    if (!d || !n) {
+      alert("Please fill in BOTH: Date (approx) and Short note.");
+      return;
+    }
+
+    const newReport: Report = {
+      id: crypto.randomUUID(),
+      landlordId: selectedLandlordId,
+      date: d,
+      repairSpeed,
+      depositReturn,
+      note: n,
+    };
+
+    setReports((prev) => [newReport, ...prev]);
+
+    // clear note/date for next entry
+    setReportDate("");
+    setNote("");
+  }
+
+  function removeReport(reportId: string) {
+    setReports((prev) => prev.filter((r) => r.id !== reportId));
+  }
+
+  return (
+    <div className="min-h-screen bg-zinc-50 p-6">
+      <div className="mx-auto max-w-4xl rounded-2xl bg-white p-6 shadow-sm">
+        
+        <p className="mt-2 text-zinc-600">
+          Add landlords and attach renter experience reports. (Stored locally in
+          your browser for now.)
+        </p>
+<h1 className="text-3xl font-semibold tracking-tight">
+  Renters Reference
+</h1>
+
+<a
+  href="/login"
+  className="mt-4 inline-block rounded-xl border px-4 py-2 text-sm"
+>
+  Login
+</a>
+
+        <div className="mt-6 flex gap-3">
+          <button
+            className="rounded-xl bg-black px-5 py-3 text-white"
+            onClick={() => setShowForm((v) => !v)}
+          >
+            {showForm ? "Close" : "Add a landlord"}
+          </button>
+
+          {selectedLandlord && (
+            <button
+              className="rounded-xl border px-5 py-3"
+              onClick={() => setSelectedLandlordId(null)}
+            >
+              Back to landlords
+            </button>
+          )}
+        </div>
+
+        {showForm && (
+          <div className="mt-6 rounded-2xl border p-5">
+            <h2 className="text-lg font-medium">Add a landlord</h2>
+
+            <label className="mt-4 block text-sm font-medium">
+              Landlord name
+            </label>
+            <input
+              className="mt-2 w-full rounded-xl border px-4 py-3"
+              value={landlordName}
+              onChange={(e) => setLandlordName(e.target.value)}
+              placeholder="Example: Jordan Smith / Maple Properties"
+            />
+
+            <label className="mt-4 block text-sm font-medium">
+              City, State
+            </label>
+            <input
+              className="mt-2 w-full rounded-xl border px-4 py-3"
+              value={cityState}
+              onChange={(e) => setCityState(e.target.value)}
+              placeholder="Example: Portsmouth, NH"
+            />
+
+            <div className="mt-4 flex gap-3">
+              <button
+                className="rounded-xl bg-black px-5 py-3 text-white"
+                onClick={saveLandlord}
+              >
+                Save
+              </button>
+              <button
+                className="rounded-xl border px-5 py-3"
+                onClick={() => setShowForm(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          {/* LEFT: landlords list */}
+          <div className="rounded-2xl border p-5">
+            <h2 className="text-lg font-medium">Landlords</h2>
+
+            {landlords.length === 0 ? (
+              <p className="mt-2 text-zinc-600">No landlords yet.</p>
+            ) : (
+              <ul className="mt-4 space-y-3">
+               {filteredLandlords.map((l) => {
+                  const count = reports.filter((r) => r.landlordId === l.id)
+                    .length;
+                  return (
+                    <li
+                      key={l.id}
+                      className="rounded-xl border p-4 hover:bg-zinc-50"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <button
+                          className="text-left"
+                          onClick={() => openReports(l.id)}
+                        >
+                          <div className="font-medium">{l.name}</div>
+                          <div className="text-sm text-zinc-600">
+                            {l.cityState} • {count} report(s)
+                          </div>
+                        </button>
+
+                        <button
+                          className="text-sm underline"
+                          onClick={() => removeLandlord(l.id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+
+          {/* RIGHT: reports panel */}
+          <div className="rounded-2xl border p-5">
+            {!selectedLandlord ? (
+              <>
+                <h2 className="text-lg font-medium">Reports</h2>
+<input
+  className="mt-3 w-full rounded-xl border px-4 py-3"
+  placeholder="Search by landlord or location..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+/>
+
+<p className="mt-2 text-sm text-zinc-600">
+  Showing {filteredLandlords.length} of {landlords.length}
+</p>
+
+                <p className="mt-2 text-zinc-600">
+                  Click a landlord to view/add reports.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="text-lg font-medium">
+                  Reports for {selectedLandlord.name}
+                </h2>
+                <p className="mt-1 text-sm text-zinc-600">
+                  {selectedLandlord.cityState}
+                </p>
+
+                <div className="mt-4 rounded-2xl border p-4">
+                  <h3 className="font-medium">Add report</h3>
+
+                  <label className="mt-3 block text-sm font-medium">
+                    Date (approx)
+                  </label>
+                  <input
+                    className="mt-2 w-full rounded-xl border px-4 py-3"
+                    value={reportDate}
+                    onChange={(e) => setReportDate(e.target.value)}
+                    placeholder="Example: 2025 / Jan 2026 / Summer 2024"
+                  />
+
+                  <label className="mt-3 block text-sm font-medium">
+                    Repair speed
+                  </label>
+                  <select
+                    className="mt-2 w-full rounded-xl border px-4 py-3"
+                    value={repairSpeed}
+                    onChange={(e) =>
+                      setRepairSpeed(e.target.value as Report["repairSpeed"])
+                    }
+                  >
+                    <option>Fast</option>
+                    <option>Okay</option>
+                    <option>Slow</option>
+                  </select>
+
+                  <label className="mt-3 block text-sm font-medium">
+                    Deposit return
+                  </label>
+                  <select
+                    className="mt-2 w-full rounded-xl border px-4 py-3"
+                    value={depositReturn}
+                    onChange={(e) =>
+                      setDepositReturn(
+                        e.target.value as Report["depositReturn"]
+                      )
+                    }
+                  >
+                    <option>On time</option>
+                    <option>Late</option>
+                    <option>Not returned</option>
+                    <option>Not sure</option>
+                  </select>
+
+                  <label className="mt-3 block text-sm font-medium">
+                    Short note
+                  </label>
+                  <textarea
+                    className="mt-2 w-full rounded-xl border px-4 py-3"
+                    rows={4}
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Stick to what happened: communication, repairs, fees, timelines..."
+                  />
+
+                  <button
+                    className="mt-4 rounded-xl bg-black px-5 py-3 text-white"
+                    onClick={saveReport}
+                  >
+                    Save report
+                  </button>
+                </div>
+
+                <div className="mt-5">
+                  <h3 className="font-medium">Saved reports</h3>
+
+                  {selectedReports.length === 0 ? (
+                    <p className="mt-2 text-zinc-600">No reports yet.</p>
+                  ) : (
+                    <ul className="mt-3 space-y-3">
+                      {selectedReports.map((r) => (
+                        <li key={r.id} className="rounded-xl border p-4">
+                          <div className="text-sm text-zinc-600">
+                            <span className="font-medium text-black">
+                              {r.date}
+                            </span>{" "}
+                            • Repairs: {r.repairSpeed} • Deposit:{" "}
+                            {r.depositReturn}
+                          </div>
+                          <p className="mt-2">{r.note}</p>
+                          <button
+                            className="mt-3 text-sm underline"
+                            onClick={() => removeReport(r.id)}
+                          >
+                            Remove report
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-10 text-sm text-zinc-500">
+          Next: add a simple search box + then move this data into Supabase so
+          it’s shared across users.
+        </div>
+      </div>
+    </div>
+  );
+}
+export default function Home() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+export default function Home() {
+
+console.log("SUPABASE URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+
+
+
+
+
+
