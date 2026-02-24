@@ -1,19 +1,28 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import StarRating from "@/components/StarRating";
+
 
 type Landlord = {
   id: string;
   name: string;
-  location: string;
-  createdAt: string; // shown to tenants later, hidden to landlords later
+  country: string;   // "US" for now
+  state: string;
+  city: string;
+ landlordType: "PRIVATE" | "MANAGEMENT" | "AIRBNB" | "OTHER";
+  createdAt: string;
 };
+<option value="AIRBNB">Airbnb / Short-term</option>
 
 type Report = {
   id: string;
   landlordId: string;
   // tenancy dates will exist later but we won't collect/show them yet
-  repairSpeed: "FAST" | "OK" | "SLOW";
+  overallRating: number;
+  confirmedRented: boolean;
+  status: "PENDING" | "VERIFIED";
+ repairSpeed: "FAST" | "OK" | "SLOW";
   depositReturn: "YES" | "NO" | "NOT_SURE";
   note: string;
   createdAt: string; // submission date (tenant-visible later)
@@ -26,9 +35,36 @@ function uid() {
 const LS_LANDLORDS = "rr_landlords_v1";
 const LS_REPORTS = "rr_reports_v1";
 
-export default function Home() {
+function stars(rating: number) {
+  const r = Math.max(0, Math.min(5, Math.round(rating || 0)));
+function getOverallRatingForLandlord(reports: Report[], landlordId: string) {
+  const nums = reports
+    .filter((r) => r.landlordId === landlordId)
+    .map((r) => Number(r.overallRating))
+    .filter((n) => Number.isFinite(n));
+
+  if (nums.length === 0) return null;
+
+  const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+  return Math.round(avg * 10) / 10;
+}
+  return (
+    <>
+      <span className="text-yellow-500">{"★★★★★".slice(0, r)}</span>
+      <span className="text-zinc-400">{"★★★★★".slice(0, 5 - r)}</span>
+    </>
+  );
+}
+
+
+
+
+  export default function Home() {
   // data
   const [landlords, setLandlords] = useState<Landlord[]>([]);
+  const [filterState, setFilterState] = useState("");
+  const [filterCity, setFilterCity] = useState("");
+  const [searchName, setSearchName] = useState("");
   const [reports, setReports] = useState<Report[]>([]);
 
   // UI
@@ -39,14 +75,17 @@ export default function Home() {
 
   // form fields
   const [landlordName, setLandlordName] = useState("");
-  const [landlordLocation, setLandlordLocation] = useState("");
-
+  const [landlordCity, setLandlordCity] = useState("");
+const [landlordState, setLandlordState] = useState("");
+const [landlordType, setLandlordType] = useState<Landlord["landlordType"]>("PRIVATE");
   const [reportLandlordId, setReportLandlordId] = useState("");
+ const [overallRating, setOverallRating] = useState<number>(5);
   const [repairSpeed, setRepairSpeed] = useState<Report["repairSpeed"]>("OK");
   const [depositReturn, setDepositReturn] =
     useState<Report["depositReturn"]>("NOT_SURE");
   const [note, setNote] = useState("");
-
+const [confirmedRented, setConfirmedRented] = useState(false);
+const [searchTerm, setSearchTerm] = useState("");
   // load from localStorage
   useEffect(() => {
     try {
@@ -63,7 +102,6 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem(LS_LANDLORDS, JSON.stringify(landlords));
   }, [landlords]);
-
   useEffect(() => {
     localStorage.setItem(LS_REPORTS, JSON.stringify(reports));
   }, [reports]);
@@ -72,39 +110,62 @@ export default function Home() {
     if (!selectedLandlordId) return null;
     return landlords.find((l) => l.id === selectedLandlordId) ?? null;
   }, [selectedLandlordId, landlords]);
+const filteredLandlords = useMemo(() => {
+  const s = filterState.trim().toUpperCase();
+  const c = filterCity.trim().toLowerCase();
+  const q = searchName.trim().toLowerCase();
+
+  return landlords.filter((l) => {
+    const matchesState = !s || l.state.toUpperCase() === s;
+    const matchesCity = !c || l.city.toLowerCase().includes(c);
+    const matchesName = !q || l.name.toLowerCase().includes(q);
+    return matchesState && matchesCity && matchesName;
+  });
+}, [landlords, filterState, filterCity, searchName]);
 
   const selectedReports = useMemo(() => {
     if (!selectedLandlordId) return [];
     return reports.filter((r) => r.landlordId === selectedLandlordId);
   }, [reports, selectedLandlordId]);
 
-  function resetForms() {
-    setLandlordName("");
-    setLandlordLocation("");
-    setReportLandlordId("");
-    setRepairSpeed("OK");
-    setDepositReturn("NOT_SURE");
-    setNote("");
-  }
 
-  function saveLandlord() {
-    const name = landlordName.trim();
-    const location = landlordLocation.trim();
+ 
 
-    if (!name) return alert("Please enter a landlord name.");
-    if (!location) return alert("Please enter a location.");
+    function resetForms() {
+  setLandlordName("");
+  setLandlordCity("");
+  setLandlordState("");
+  setLandlordType("PRIVATE");
+  setReportLandlordId("");
+  setRepairSpeed("OK");
+  setDepositReturn("NOT_SURE");
+  setNote("");
+  setConfirmedRented(false);
+}
 
-    const newLandlord: Landlord = {
-      id: uid(),
-      name,
-      location,
-      createdAt: new Date().toISOString(),
-    };
+    function saveLandlord() {
+  const name = landlordName.trim();
+  const city = landlordCity.trim();
+  const state = landlordState.trim().toUpperCase();
 
-    setLandlords((prev) => [newLandlord, ...prev]);
-    resetForms();
-    setView("list");
-  }
+  if (!name) return alert("Please enter a landlord name.");
+  if (!city) return alert("Please enter a city.");
+  if (!state) return alert("Please enter a state.");
+
+  const newLandlord: Landlord = {
+    id: uid(),
+    name,
+    country: "US",
+    state,
+    city,
+    landlordType,
+    createdAt: new Date().toISOString(),
+  };
+
+  setLandlords((prev) => [newLandlord, ...prev]);
+  resetForms();
+  setView("list");
+}
 
   function removeLandlord(id: string) {
     const ok = confirm("Delete this landlord and all associated reports?");
@@ -118,39 +179,51 @@ export default function Home() {
   function saveReport() {
     const landlordId = reportLandlordId || selectedLandlordId || "";
     if (!landlordId) return alert("Please choose a landlord first.");
-    if (!note.trim()) return alert("Please add a short note (1–2 sentences).");
+    // if (!note.trim()) return alert("Please add a short note (1–2 sentences).");
 
-    const newReport: Report = {
+
+        const newReport: Report = {
       id: uid(),
       landlordId,
+      overallRating,
+      confirmedRented,
+      status: "PENDING",
       repairSpeed,
       depositReturn,
       note: note.trim(),
       createdAt: new Date().toISOString(),
     };
 
-    setReports((prev) => [newReport, ...prev]);
-    resetForms();
-    setView("list");
-    setSelectedLandlordId(landlordId);
+
+ setReports((prev) => [newReport, ...prev]);
+
+resetForms();
+setOverallRating(0); // or whatever your “empty” rating should be
+
+setSelectedLandlordId(landlordId);
+setView("list");
+   
   }
+  
+function verifyReport(reportId: string) {
+  setReports((prev) =>
+    prev.map((r) => (r.id === reportId ? { ...r, status: "VERIFIED" } : r))
+  );
+}
 
   function removeReport(reportId: string) {
     setReports((prev) => prev.filter((r) => r.id !== reportId));
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 p-6">
+    <div className="min-h-screen bg-transparent flex items-center justify-center">
       <div className="mx-auto max-w-4xl rounded-2xl bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between gap-6">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">
               Renters Reference
             </h1>
-            <p className="mt-2 text-zinc-600">
-              Add landlords and attach renter experience reports. (Stored locally
-              in your browser for now.)
-            </p>
+            
           </div>
 
           <a
@@ -178,6 +251,9 @@ export default function Home() {
             onClick={() => {
               resetForms();
               setView("addReport");
+             setNote("");
+setConfirmedRented(false);
+ 
               if (selectedLandlordId) setReportLandlordId(selectedLandlordId);
             }}
             disabled={landlords.length === 0}
@@ -192,37 +268,99 @@ export default function Home() {
           {/* LEFT: list */}
           <div>
             <h2 className="text-lg font-medium">Landlords</h2>
+<div className="mt-3 grid gap-2">
+  <input
+    className="w-full rounded-xl border px-4 py-3 text-sm"
+    value={filterState}
+    onChange={(e) => setFilterState(e.target.value)}
+    placeholder="Filter by state (e.g., NH)"
+  />
+  <input
+    className="w-full rounded-xl border px-4 py-3 text-sm"
+    value={filterCity}
+    onChange={(e) => setFilterCity(e.target.value)}
+    placeholder="Filter by city (e.g., Manchester)"
+  />
+  <input
+    className="w-full rounded-xl border px-4 py-3 text-sm"
+    value={searchName}
+    onChange={(e) => setSearchName(e.target.value)}
+    placeholder="Search landlord name"
+  />
+</div>
 
             {landlords.length === 0 ? (
               <p className="mt-2 text-zinc-600">No landlords yet.</p>
-            ) : (
-              <ul className="mt-4 space-y-3">
-                {landlords.map((l) => {
-                  const count = reports.filter((r) => r.landlordId === l.id)
-                    .length;
-                  const isSelected = selectedLandlordId === l.id;
+        ) : (
+    <>
+    <input
+      type="text"
+      placeholder="Search landlords by name, city, or state..."
+      className="mt-4 w-full rounded-xl border px-4 py-2 text-sm"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+    />
+    <ul className="mt-4 space-y-3">
+  {filteredLandlords.map((l) => {
+    const landlordReports = reports.filter((r) => r.landlordId === l.id);
+    const allReports = reports.filter((r) => r.landlordId === l.id);
+const totalCount = reports.filter((r) => r.landlordId === l.id).length;
+    const verifiedReports = allReports.filter((r) => r.status === "VERIFIED");
+const count = landlordReports.length;
+const totalPoints = reports
+  .filter((r) => r.landlordId === l.id)
+  .reduce((sum, r) => sum + (r.overallRating ?? 0), 0);
+const verifiedCount = reports.filter(
+  (r) => r.landlordId === l.id && r.status === "VERIFIED"
+).length;
+const overall =
+  totalCount === 0 ? null : Math.round((totalPoints / totalCount) * 10) / 10;
+  {overall !== null && (
+  <div className="text-sm text-zinc-700">
+    Overall rating: {overall} / 5 ({verifiedCount} verified of {totalCount})
+  </div>
+)}
+    return (
+      <li key={l.id}
+       className="rounded-xl border p-4"
+      >
 
-                  return (
-                    <li
-                      key={l.id}
-                      className={`rounded-xl border p-4 ${
-                        isSelected ? "border-black" : ""
-                      }`}
-                    >
                       <button
                         className="w-full text-left"
                         onClick={() => setSelectedLandlordId(l.id)}
                       >
                         <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <div className="font-medium">{l.name}</div>
-                            <div className="text-sm text-zinc-600">
-                              {l.location}
-                            </div>
-                          </div>
-                          <div className="text-sm text-zinc-600">
-                            {count} report{count === 1 ? "" : "s"}
-                          </div>
+                         <div>
+  <div className="font-medium">
+    {l.name} — {l.city}, {l.state}
+    
+{overall !== null && (
+  <div className="text-sm text-zinc-700">
+   Overall rating: {overall} / 5 ({verifiedCount} verified of {totalCount})
+  </div>
+)}
+  </div>
+ 
+<div className="mt-2"></div>
+
+  
+<div className="mt-1 text-sm text-zinc-600">
+  {count === 0 ? (
+    "No reports yet."
+  ) : (
+    <>
+  <span className="font-semibold text-yellow-500">
+    {stars(avg!)}
+  </span>{" "}
+  ({avg}/5) • {count} {count === 1 ? "report" : "reports"}
+</>
+  )}
+</div>
+</div>
+    {/* <div className="text-sm text-zinc-600">
+  {count} report{count === 1 ? "" : "s"}
+</div> */}
+                                                          
                         </div>
                       </button>
 
@@ -250,9 +388,9 @@ export default function Home() {
                   );
                 })}
               </ul>
+              </>
             )}
           </div>
-
           {/* RIGHT: details / forms */}
           <div>
             {view === "addLandlord" && (
@@ -269,15 +407,33 @@ export default function Home() {
                   placeholder="Example: Jordan Smith / Maple Properties"
                 />
 
-                <label className="mt-4 block text-sm font-medium">
-                  Location (city + state)
-                </label>
-                <input
-                  className="mt-2 w-full rounded-xl border px-4 py-3"
-                  value={landlordLocation}
-                  onChange={(e) => setLandlordLocation(e.target.value)}
-                  placeholder="Example: Burlington, VT"
-                />
+                <label className="mt-4 block text-sm font-medium">City</label>
+<input
+  className="mt-2 w-full rounded-xl border px-4 py-3"
+  value={landlordCity}
+  onChange={(e) => setLandlordCity(e.target.value)}
+  placeholder="Example: Burlington"
+  />
+
+<label className="mt-4 block text-sm font-medium">State</label>
+<input
+  className="mt-2 w-full rounded-xl border px-4 py-3"
+  value={landlordState}
+  onChange={(e) => setLandlordState(e.target.value)}
+  placeholder="Example: VT"
+  />
+
+<label className="mt-4 block text-sm font-medium">Landlord type</label>
+<select
+  className="mt-2 w-full rounded-xl border px-4 py-3"
+  value={landlordType}
+  onChange={(e) => setLandlordType(e.target.value as Landlord["landlordType"])}
+>
+  <option value="PRIVATE">Private owner</option>
+  <option value="MANAGEMENT">Management company</option>
+  <option value="OTHER">Other / Not sure</option>
+  <option value="SHORT_TERM">Short-term rental (Airbnb / Vrbo)</option>
+</select>
 
                 <div className="mt-5 flex gap-3">
                   <button
@@ -302,23 +458,47 @@ export default function Home() {
             {view === "addReport" && (
               <div className="rounded-2xl border p-5">
                 <h2 className="text-lg font-medium">Add a report</h2>
+<label className="mt-4 block text-sm font-medium">
+  Choose landlord
+</label>
 
-                <label className="mt-4 block text-sm font-medium">
-                  Choose landlord
-                </label>
-                <select
-                  className="mt-2 w-full rounded-xl border px-4 py-3"
-                  value={reportLandlordId}
-                  onChange={(e) => setReportLandlordId(e.target.value)}
-                >
-                  <option value="">Select...</option>
-                  {landlords.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.name} — {l.location}
-                    </option>
-                  ))}
-                </select>
+<select
+  className="mt-2 w-full rounded-xl border px-4 py-3"
+  value={selectedLandlordId ?? ""}
+  onChange={(e) => setSelectedLandlordId(e.target.value || null)}
+>
 
+
+  <option value="">Select...</option>
+ {landlords
+  .filter((l) =>
+    `${l.name} ${l.city} ${l.state}`.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+  .map((l) => (
+
+    <option key={l.id} value={l.id}>
+      {l.name} — {l.city}, {l.state}
+
+    </option>
+  ))}
+</select>
+<label className="mt-4 block text-sm font-medium">
+  Overall rating
+</label>
+
+<select
+  className="mt-2 w-full rounded-xl border px-4 py-3"
+  value={overallRating}
+  onChange={(e) => setOverallRating(Number(e.target.value))}
+>
+  <option value={0}>No rating</option>
+  <option value={1}>1</option>
+  <option value={2}>2</option>
+  <option value={3}>3</option>
+  <option value={4}>4</option>
+  <option value={5}>5</option>
+</select>
+               
                 <label className="mt-4 block text-sm font-medium">
                   Repair speed
                 </label>
@@ -358,7 +538,13 @@ export default function Home() {
                 <label className="mt-4 block text-sm font-medium">
                   Short note (1–2 sentences)
                 </label>
-               <textarea
+               <div className="text-xs text-zinc-500">
+  Reports are anonymous and publicly visible. Do not include unit numbers, exact dates, or identifying details. Submit reports after your tenancy has ended and focus on factual experiences.
+</div> 
+<div className="text-xs text-zinc-500">
+  Reports are anonymous and publicly visible. Do not include unit numbers, exact dates, or identifying details. Submit reports after your tenancy has ended and focus on factual experiences.
+</div>
+             <textarea
   className="mt-2 w-full rounded-xl border px-4 py-3"
   rows={4}
   maxLength={250}
@@ -366,6 +552,16 @@ export default function Home() {
   onChange={(e) => setNote(e.target.value)}
   placeholder="Optional context (max 250 characters)"
 />
+<label className="mt-4 flex items-center gap-2 text-sm">
+  <input
+    type="checkbox"
+    className="h-4 w-4"
+    checked={confirmedRented}
+    onChange={(e) => setConfirmedRented(e.target.checked)}
+  />
+  I confirm I rented from this landlord.
+</label>
+   
 <div className="mt-1 text-xs text-zinc-500 text-right">
   {note.length} / 250
 </div>
@@ -391,7 +587,7 @@ export default function Home() {
 
             {view === "list" && (
               <div className="rounded-2xl border p-5">
-                <h2 className="text-lg font-medium">Details</h2>
+                <h2 className="text-lg font-medium">Reports</h2>
 
                 {!selectedLandlord ? (
                   <p className="mt-2 text-zinc-600">
@@ -404,7 +600,8 @@ export default function Home() {
                         {selectedLandlord.name}
                       </div>
                       <div className="text-sm text-zinc-600">
-                        {selectedLandlord.location}
+                       {selectedLandlord.city}, {selectedLandlord.state}
+
                       </div>
                     </div>
 
@@ -412,9 +609,7 @@ export default function Home() {
                       <h3 className="text-sm font-medium text-zinc-700">
   Reports
 </h3>
-<p className="mt-3 text-sm text-zinc-500">
-  Reports reflect individual renter experiences and may not represent every tenancy.
-</p>
+
 
 
                       {selectedReports.length === 0 ? (
@@ -432,16 +627,56 @@ export default function Home() {
   ? "No"
   : "Not sure"}
                              </div>
-                              <p className="mt-2">{r.note}</p>
-                              <button
-                                className="mt-3 text-sm underline"
-                                onClick={() => removeReport(r.id)}
-                              >
-                                Remove report
-                              </button>
+<div key={r.id} className="mt-1 text-sm text-zinc-600">
+
+
+  Overall rating:{" "}
+  <span aria-label={`Overall rating ${r.overallRating} out of 5`}>
+    {stars(r.overallRating)} ({r.overallRating}/5)
+  </span>
+</div>
+               <p className="mt-2">{r.note}</p>
+
+<div className="mt-1 text-xs text-zinc-500">
+  Reporter: {r.confirmedRented ? "confirmed renter" : "not confirmed"}
+</div>
+
+<div className="text-xs text-zinc-500">
+  Admin: {r.status === "VERIFIED" ? "verified" : "pending"}
+</div>
+ <div className="mt-3 flex gap-4">
+  <button
+    type="button"
+    className="text-sm underline"
+    disabled={r.status === "VERIFIED"}
+    onClick={(e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      verifyReport(r.id);
+    }}
+  >
+    {r.status === "VERIFIED" ? "Verified" : "Mark verified"}
+  </button>
+
+  <button
+    type="button"
+    className="text-sm underline"
+    onClick={(e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      removeReport(r.id);
+    }}
+  >
+    Remove report
+  </button>
+</div>
+
+
+                               
                             </li>
                           ))}
                         </ul>
+                        
                       )}
                     </div>
                   </>
@@ -451,10 +686,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-10 text-sm text-zinc-500">
-          Next: connect this to Supabase so it’s shared across users + add roles
-          (tenant/landlord/mod) and privacy rules.
-        </div>
+        
       </div>
     </div>
   );
