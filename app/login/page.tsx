@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { getSupabase } from "@/lib/SupabaseClient";
+import { getSupabase } from "@/lib/supabaseClient";
 
 export const dynamic = "force-dynamic";
 
