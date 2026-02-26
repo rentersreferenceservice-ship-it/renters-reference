@@ -1,4 +1,5 @@
-"use client";
+// deploy test
+// "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import StarRating from "@/components/StarRating";
@@ -35,8 +36,6 @@ function uid() {
 const LS_LANDLORDS = "rr_landlords_v1";
 const LS_REPORTS = "rr_reports_v1";
 
-function stars(rating: number) {
-  const r = Math.max(0, Math.min(5, Math.round(rating || 0)));
 function getOverallRatingForLandlord(reports: Report[], landlordId: string) {
   const nums = reports
     .filter((r) => r.landlordId === landlordId)
@@ -48,6 +47,10 @@ function getOverallRatingForLandlord(reports: Report[], landlordId: string) {
   const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
   return Math.round(avg * 10) / 10;
 }
+
+function stars(rating: number) {
+  const r = Math.max(0, Math.min(5, Math.round(rating || 0)));
+
   return (
     <>
       <span className="text-yellow-500">{"★★★★★".slice(0, r)}</span>
@@ -55,8 +58,6 @@ function getOverallRatingForLandlord(reports: Report[], landlordId: string) {
     </>
   );
 }
-
-
 
 
   export default function Home() {
@@ -350,9 +351,9 @@ const overall =
   ) : (
     <>
   <span className="font-semibold text-yellow-500">
-    {stars(avg!)}
+    stars(overall!)
   </span>{" "}
-  ({avg}/5) • {count} {count === 1 ? "report" : "reports"}
+  ({overall}/5) • {count} {count === 1 ? "report" : "reports"}
 </>
   )}
 </div>
