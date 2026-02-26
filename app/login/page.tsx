@@ -1,156 +1,102 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { getSupabase } from "@/lib/SupabaseClient";
+
+export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
-  const [pw2, setPw2] = useState("");
-  const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setMsg("");
+    setMsg(null);
 
     const cleanEmail = email.trim();
     if (!cleanEmail || !pw) {
-      setMsg("Please enter email and password.");
+      setMsg("Enter email and password.");
       return;
     }
 
-    if (mode === "signup" && pw !== pw2) {
-      setMsg("Passwords do not match.");
-      return;
-    }
+    setLoading(true);
+    try {
+      const supabase = getSupabase();
 
-    if (mode === "login") {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password: pw,
-      });
-
-      if (error) {
-        setMsg(error.message);
-        return;
+      if (mode === "login") {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password: pw,
+        });
+        if (error) setMsg(error.message);
+        else setMsg("Logged in!");
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email: cleanEmail,
+          password: pw,
+        });
+        if (error) setMsg(error.message);
+        else setMsg("Check your email to confirm sign-up.");
       }
-
-      window.location.href = "/";
-      return;
+    } catch (err: any) {
+      setMsg(err?.message ?? "Something went wrong.");
+    } finally {
+      setLoading(false);
     }
-
-    // signup
-    const { error } = await supabase.auth.signUp({
-      email: cleanEmail,
-      password: pw,
-    });
-
-    if (error) {
-      // common case: they already signed up earlier
-      if (error.message.toLowerCase().includes("already registered")) {
-        setMsg("You already have an account. Switch to Log in.");
-        setMode("login");
-        return;
-      }
-
-      setMsg(error.message);
-      return;
-    }
-
-    // Depending on your Supabase auth settings, they may need email confirmation.
-    setMsg("Account created. If email confirmation is enabled, check your inbox.");
-    // Optional: send them back to login mode
-    setMode("login");
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-transparent">
-      <div className="mx-auto max-w-md rounded-2xl bg-white p-6 shadow-sm">
-        <div className="flex items-start justify-between">
+    <div className="min-h-screen flex items-center justify-center bg-transparent p-6">
+      <div className="mx-auto w-full max-w-md rounded-2xl bg-white p-6 shadow-sm">
+        <div className="flex items-start justify-between gap-4">
           <h1 className="text-2xl font-semibold tracking-tight">
             Renters Reference
           </h1>
 
-          <a href="/" className="text-sm underline">
-            Back to app
-          </a>
-        </div>
-
-        <div className="mt-4 flex gap-2">
           <button
             type="button"
-            className={`rounded-xl border px-3 py-1 text-sm ${
-              mode === "login" ? "bg-black text-white" : ""
-            }`}
-            onClick={() => {
-              setMode("login");
-              setMsg("");
-            }}
+            className="text-sm underline"
+            onClick={() => setMode(mode === "login" ? "signup" : "login")}
           >
-            Log in
-          </button>
-
-          <button
-            type="button"
-            className={`rounded-xl border px-3 py-1 text-sm ${
-              mode === "signup" ? "bg-black text-white" : ""
-            }`}
-            onClick={() => {
-              setMode("signup");
-              setMsg("");
-            }}
-          >
-            Create account
+            {mode === "login" ? "Create account" : "Have an account?"}
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-5 space-y-3">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full rounded-xl border px-3 py-2 text-sm"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full rounded-xl border px-3 py-2 text-sm"
-            value={pw}
-            onChange={(e) => setPw(e.target.value)}
-            autoComplete={mode === "login" ? "current-password" : "new-password"}
-          />
-
-          {mode === "signup" && (
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div>
+            <label className="text-sm text-zinc-700">Email</label>
             <input
-              type="password"
-              placeholder="Confirm password"
-              className="w-full rounded-xl border px-3 py-2 text-sm"
-              value={pw2}
-              onChange={(e) => setPw2(e.target.value)}
-              autoComplete="new-password"
+              className="mt-1 w-full rounded-xl border px-3 py-2"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
             />
-          )}
+          </div>
+
+          <div>
+            <label className="text-sm text-zinc-700">Password</label>
+            <input
+              className="mt-1 w-full rounded-xl border px-3 py-2"
+              type="password"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              autoComplete={mode === "login" ? "current-password" : "new-password"}
+            />
+          </div>
 
           <button
+            className="w-full rounded-xl bg-black px-4 py-2 text-white disabled:opacity-60"
             type="submit"
-            className="w-full rounded-xl bg-black px-4 py-2 text-sm text-white"
+            disabled={loading}
           >
-            {mode === "login" ? "Log in" : "Create account"}
+            {loading ? "Working..." : mode === "login" ? "Log in" : "Sign up"}
           </button>
+
+          {msg && <div className="text-sm text-zinc-700">{msg}</div>}
         </form>
-
-        {msg && <div className="mt-4 text-sm text-zinc-600">{msg}</div>}
-
-        <p className="mt-6 text-xs text-zinc-500">
-          Auth is powered by Supabase. If email confirmation is enabled in your
-          Supabase project, you may need to confirm before logging in.
-        </p>
       </div>
     </div>
   );
