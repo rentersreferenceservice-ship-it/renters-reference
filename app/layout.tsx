@@ -37,6 +37,10 @@ export default function RootLayout({
 ></div>
   {/* APP CONTENT */}
   <div className="min-h-screen relative z-10 bg-transparent">
+  {/* force redeploy */}
+  {children}
+</div>
+  <div className="min-h-screen relative z-10 bg-transparent">
     {children}
   </div>
 </body>  
