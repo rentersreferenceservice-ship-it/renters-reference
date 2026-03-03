@@ -78,7 +78,8 @@ export default function LoginClient() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
+<div className="w-full max-w-md rounded-2xl border bg-white p-6 shadow"></div>
       <h1 className="text-xl font-semibold mb-3">
         {mode === "login" ? "Log in" : "Sign up"}
       </h1>
@@ -114,7 +115,7 @@ export default function LoginClient() {
       </form>
 
       <div className="mt-3 flex items-center justify-between text-sm">
-        <p className="text-xs">DEBUG: forgot password section</p>
+        <p className="text-xs"></p>
         <button
           type="button"
           onClick={handleForgotPassword}
