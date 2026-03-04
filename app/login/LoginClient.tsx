@@ -2,36 +2,36 @@
 
 import { useState } from "react";
 import { getSupabase } from "@/lib/supabaseClient";
-
+import { useRouter } from "next/navigation";
 export default function LoginClient() {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-
+const router = useRouter();
   async function handleForgotPassword() {
-    setMsg(null);
+  setMsg("Working on password reset...");
 
-    const supabase = getSupabase();
-    const cleanEmail = (email || "").trim();
-
-    if (!cleanEmail) {
-      setMsg("Please enter your email first.");
-      return;
-    }
-
-    const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
-      redirectTo: "https://rentersreference.org/reset-password",
-    });
-
-    if (error) {
-      setMsg(error.message);
-      return;
-    }
-
-    setMsg("Check your email for a password reset link.");
+  const supabase = getSupabase();
+  const cleanEmail = (email || "").trim();
+const { error } = await supabase.auth.signInWithPassword({
+  email: cleanEmail,
+  password: pw,
+});
+  if (!cleanEmail) {
+    setMsg("Please enter your email first.");
+    return;
   }
+
+  if (error) {
+    setMsg("Reset error: " + error.message);
+    return;
+  }
+
+  router.replace("/");
+
+}
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,6 +60,8 @@ export default function LoginClient() {
           setMsg(error.message);
           return;
         }
+        router.replace("/");
+return;
       } else {
         const { error } = await supabase.auth.signUp({
           email: cleanEmail,
@@ -71,7 +73,7 @@ export default function LoginClient() {
         }
       }
 
-      setMsg("Success.");
+    
     } finally {
       setLoading(false);
     }
@@ -118,7 +120,7 @@ export default function LoginClient() {
           <p className="text-xs"></p>
           <button
             type="button"
-            onClick={handleForgotPassword}
+          onClick={handleForgotPassword}
             className="underline"
           >
             Forgot your password?
