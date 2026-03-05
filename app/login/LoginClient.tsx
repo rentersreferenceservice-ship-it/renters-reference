@@ -86,10 +86,10 @@ return;
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md rounded-2xl border bg-white p-6 shadow">
         <h1 className="text-xl font-semibold mb-3">
-          <p className="text-xs mb-2">BUILD STAMP: b4f5958</p>
-          {mode === "login" ? "Log in" : "Sign up"}
+
         </h1>
 
+          {mode === "login" ? "Log in" : "Sign up"}
         {msg && <p className="mb-3 text-sm">{msg}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-3">
