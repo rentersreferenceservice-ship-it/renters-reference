@@ -6,7 +6,7 @@ import { getSupabase } from "@/lib/supabaseClient";
 
 export default function ResetPasswordClient() {
   const router = useRouter();
-  const supabase = getSupabase();
+  
 
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
@@ -16,7 +16,7 @@ export default function ResetPasswordClient() {
       setMsg("Please enter a new password.");
       return;
     }
-
+const supabase = getSupabase();
     const { error } = await supabase.auth.updateUser({
       password: password,
     });
