@@ -15,22 +15,25 @@ const router = useRouter();
 
   const supabase = getSupabase();
   const cleanEmail = (email || "").trim();
-const { error } = await supabase.auth.signInWithPassword({
-  email: cleanEmail,
-  password: pw,
-});
+
   if (!cleanEmail) {
     setMsg("Please enter your email first.");
     return;
   }
 
-  if (error) {
-    setMsg("Reset error: " + error.message);
+  const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+    cleanEmail,
+    {
+      redirectTo: "https://rentersreference.org/reset-password",
+    }
+  );
+
+  if (resetError) {
+    setMsg("Reset error: " + resetError.message);
     return;
   }
 
-  router.replace("/");
-
+  setMsg("Success: Check your email for a reset link.");
 }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -83,6 +86,7 @@ return;
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md rounded-2xl border bg-white p-6 shadow">
         <h1 className="text-xl font-semibold mb-3">
+          <p className="text-xs mb-2">BUILD STAMP: b4f5958</p>
           {mode === "login" ? "Log in" : "Sign up"}
         </h1>
 
