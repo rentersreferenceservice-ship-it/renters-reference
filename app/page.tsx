@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import StarRating from "@/components/StarRating";
-
+import { createClient } from "@supabase/supabase-js";
 
 type Landlord = {
   id: string;
@@ -59,12 +59,21 @@ function stars(rating: number) {
   );
 }
 
+  console.log("SUPABASE TEST");
+  const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
   export default function Home() {
+    
   // data
+  
   const [landlords, setLandlords] = useState<Landlord[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [filterState, setFilterState] = useState("");
   const [filterCity, setFilterCity] = useState("");
+  const [filterLandlord, setFilterLandlord] = useState("");
   const [searchName, setSearchName] = useState("");
   const [reports, setReports] = useState<Report[]>([]);
 
@@ -98,7 +107,64 @@ const [searchTerm, setSearchTerm] = useState("");
       // ignore
     }
   }, []);
+  // load from Supabase
+useEffect(() => {
+  const run = async () => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
+    const landlordsRes = await supabase
+      .from("landlords")
+      .select("id,name,city,state");
+console.log("LANDLORDS RESULT:", landlordsRes);
+    if (!landlordsRes.error && landlordsRes.data) {
+      setLandlords(landlordsRes.data as any);
+    }
+
+    const reportsRes = await supabase
+      .from("reports")
+      .select("id,created_at,landlord_id,rating,report_text");
+
+    if (!reportsRes.error && reportsRes.data) {
+      setReports(reportsRes.data as any);
+    }
+  };
+
+  run();
+}, []);
+  // load from Supabase (seeded landlords + reports)
+useEffect(() => {
+  const run = async () => {
+    try {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      const { data: dbLandlords, error: landlordsError } = await supabase
+        .from("landlords")
+        .select("id,name,city,state")
+        .order("name", { ascending: true })
+        .limit(1000);
+
+        const { data: dbReports, error: reportsError } = await supabase
+        .from("reports")
+        .select("id,created_at,landlord_id,rating,report_text")
+        .order("created_at", { ascending: false })
+        .limit(1000);
+
+      if (!reportsError && dbReports) setReports(dbReports as any);
+
+      
+    
+    } catch {}
+  };
+
+  run();
+}, []);
+// load from localStorage
   // persist to localStorage
   useEffect(() => {
     localStorage.setItem(LS_LANDLORDS, JSON.stringify(landlords));
@@ -112,17 +178,20 @@ const [searchTerm, setSearchTerm] = useState("");
     return landlords.find((l) => l.id === selectedLandlordId) ?? null;
   }, [selectedLandlordId, landlords]);
 const filteredLandlords = useMemo(() => {
-  const s = filterState.trim().toUpperCase();
+ const s = filterState.trim().toUpperCase();
+const stateQuery = s === "MASSACHUSETTS" ? "MA" : s;
   const c = filterCity.trim().toLowerCase();
-  const q = searchName.trim().toLowerCase();
+ const q = filterLandlord.trim().toLowerCase();
 
   return landlords.filter((l) => {
-    const matchesState = !s || l.state.toUpperCase() === s;
+    const matchesState = !stateQuery || l.state.toUpperCase().includes(stateQuery);
+    if (stateQuery === "MA") console.log("STATE CHECK", l.name, l.state, matchesState);
     const matchesCity = !c || l.city.toLowerCase().includes(c);
     const matchesName = !q || l.name.toLowerCase().includes(q);
+   if (filterState === "MA") return matchesState && matchesCity && matchesName;
     return matchesState && matchesCity && matchesName;
   });
-}, [landlords, filterState, filterCity, searchName]);
+}, [landlords, filterState, filterCity, filterLandlord]);
 
   const selectedReports = useMemo(() => {
     if (!selectedLandlordId) return [];
@@ -223,6 +292,8 @@ function verifyReport(reportId: string) {
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">
               Renters Reference
+              
+             
             </h1>
             
           </div>
@@ -269,19 +340,40 @@ setConfirmedRented(false);
           {/* LEFT: list */}
           <div>
             <h2 className="text-lg font-medium">Landlords</h2>
+<p className="mt-2 text-sm text-zinc-600">State: {filterState} | City: {filterCity} | Landlord: {filterLandlord} | Count: {filteredLandlords.length}</p>
 <div className="mt-3 grid gap-2">
   <input
     className="w-full rounded-xl border px-4 py-3 text-sm"
     value={filterState}
+    list="state-options"
     onChange={(e) => setFilterState(e.target.value)}
     placeholder="Filter by state (e.g., NH)"
   />
+  <datalist id="state-options">
+  <option value="MA" />
+  <option value="NH" />
+  <option value="ME" />
+  <option value="VT" />
+  <option value="CT" />
+  <option value="RI" />
+  <option value="NY" />
+</datalist>
   <input
     className="w-full rounded-xl border px-4 py-3 text-sm"
     value={filterCity}
-    onChange={(e) => setFilterCity(e.target.value)}
+    onChange={(e) => {
+  setFilterState(e.target.value);
+  console.log("STATE INPUT", e.target.value);
+}}
+    
     placeholder="Filter by city (e.g., Manchester)"
   />
+  <input
+  className="w-full rounded-xl border px-4 py-3 text-sm"
+  value={filterLandlord}
+  onChange={(e) => setFilterLandlord(e.target.value)}
+  placeholder="Filter by landlord name (e.g., Hamilton)"
+/>
   <input
     className="w-full rounded-xl border px-4 py-3 text-sm"
     value={searchName}
@@ -321,7 +413,11 @@ const overall =
     Overall rating: {overall} / 5 ({verifiedCount} verified of {totalCount})
   </div>
 )}
-    return (
+
+
+
+
+return (
       <li key={l.id}
        className="rounded-xl border p-4"
       >
@@ -468,14 +564,9 @@ const overall =
   value={selectedLandlordId ?? ""}
   onChange={(e) => setSelectedLandlordId(e.target.value || null)}
 >
-
-
-  <option value="">Select...</option>
- {landlords
-  .filter((l) =>
-    `${l.name} ${l.city} ${l.state}`.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-  .map((l) => (
+ <option value="">Select...</option>
+ {filteredLandlords.map((l) => (
+ 
 
     <option key={l.id} value={l.id}>
       {l.name} — {l.city}, {l.state}
