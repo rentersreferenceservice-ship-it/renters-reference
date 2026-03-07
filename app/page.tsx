@@ -361,10 +361,7 @@ setConfirmedRented(false);
   <input
     className="w-full rounded-xl border px-4 py-3 text-sm"
     value={filterCity}
-    onChange={(e) => {
-  setFilterState(e.target.value);
-  console.log("STATE INPUT", e.target.value);
-}}
+    onChange={(e) => setFilterCity(e.target.value)}
     
     placeholder="Filter by city (e.g., Manchester)"
   />
