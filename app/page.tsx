@@ -99,10 +99,7 @@ const [searchTerm, setSearchTerm] = useState("");
   // load from localStorage
   useEffect(() => {
     try {
-      const savedLandlords = localStorage.getItem(LS_LANDLORDS);
-      const savedReports = localStorage.getItem(LS_REPORTS);
-      if (savedLandlords) setLandlords(JSON.parse(savedLandlords));
-      if (savedReports) setReports(JSON.parse(savedReports));
+      
     } catch {
       // ignore
     }
@@ -128,7 +125,19 @@ console.log("LANDLORDS RESULT:", landlordsRes);
       .select("id,created_at,landlord_id,rating,report_text");
 
     if (!reportsRes.error && reportsRes.data) {
-      setReports(reportsRes.data as any);
+     setReports(
+  reportsRes.data.map((r: any) => ({
+    id: r.id,
+    landlordId: r.landlord_id,
+    overallRating: r.rating,
+    note: r.report_text,
+    createdAt: r.created_at,
+    confirmedRented: true,
+    status: "PENDING",
+    repairSpeed: "OK",
+    depositReturn: "NOT_SURE",
+  })) as any
+);
     }
   };
 
@@ -167,10 +176,10 @@ useEffect(() => {
 // load from localStorage
   // persist to localStorage
   useEffect(() => {
-    localStorage.setItem(LS_LANDLORDS, JSON.stringify(landlords));
+   
   }, [landlords]);
   useEffect(() => {
-    localStorage.setItem(LS_REPORTS, JSON.stringify(reports));
+
   }, [reports]);
 
   const selectedLandlord = useMemo(() => {
@@ -197,10 +206,6 @@ const stateQuery = s === "MASSACHUSETTS" ? "MA" : s;
     if (!selectedLandlordId) return [];
     return reports.filter((r) => r.landlordId === selectedLandlordId);
   }, [reports, selectedLandlordId]);
-
-
- 
-
     function resetForms() {
   setLandlordName("");
   setLandlordCity("");
@@ -246,7 +251,7 @@ const stateQuery = s === "MASSACHUSETTS" ? "MA" : s;
     if (selectedLandlordId === id) setSelectedLandlordId(null);
   }
 
-  function saveReport() {
+  async function saveReport() {
     const landlordId = reportLandlordId || selectedLandlordId || "";
     if (!landlordId) return alert("Please choose a landlord first.");
     // if (!note.trim()) return alert("Please add a short note (1–2 sentences).");
@@ -264,7 +269,17 @@ const stateQuery = s === "MASSACHUSETTS" ? "MA" : s;
       createdAt: new Date().toISOString(),
     };
 
+const { error } = await supabase
+  .from("reports")
+  .insert({
+    landlord_id: landlordId,
+    rating: overallRating,
+    report_text: note.trim(),
+  });
 
+if (error) {
+  console.error("Supabase insert error:", error);
+}
  setReports((prev) => [newReport, ...prev]);
 
 resetForms();
@@ -307,40 +322,14 @@ function verifyReport(reportId: string) {
           </a>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            className="rounded-xl bg-black px-4 py-2 text-sm text-white"
-            onClick={() => {
-              resetForms();
-              setView("addLandlord");
-            }}
-          >
-            Add landlord
-          </button>
-
-          <button
-            className="rounded-xl border px-4 py-2 text-sm"
-            onClick={() => {
-              resetForms();
-              setView("addReport");
-             setNote("");
-setConfirmedRented(false);
- 
-              if (selectedLandlordId) setReportLandlordId(selectedLandlordId);
-            }}
-            disabled={landlords.length === 0}
-            title={landlords.length === 0 ? "Add a landlord first" : ""}
-          >
-            Add report
-          </button>
-        </div>
+        
 
         {/* MAIN */}
-        <div className="mt-8 grid gap-8 md:grid-cols-2">
+       <div className="mt-4 grid gap-8 md:grid-cols-2">
           {/* LEFT: list */}
           <div>
-            <h2 className="text-lg font-medium">Landlords</h2>
-<p className="mt-2 text-sm text-zinc-600">State: {filterState} | City: {filterCity} | Landlord: {filterLandlord} | Count: {filteredLandlords.length}</p>
+         <h2 className="text-lg font-medium">Search landlords</h2>  
+
 <div className="mt-3 grid gap-2">
   <input
     className="w-full rounded-xl border px-4 py-3 text-sm"
@@ -674,32 +663,144 @@ return (
               </div>
             )}
 
-            {view === "list" && (
-              <div className="rounded-2xl border p-5">
-                <h2 className="text-lg font-medium">Reports</h2>
+        {view === "list" && (
+  <>
+    {/* ACTION CARD */}
+    <div className="rounded-2xl border p-5 mb-4 space-y-3">
+      <button
+        className="w-full rounded-xl bg-black px-4 py-2 text-sm text-white"
+        onClick={() => {
+          resetForms();
+          setView("addLandlord");
+        }}
+      >
+        Add landlord
+      </button>
 
-                {!selectedLandlord ? (
-                  <p className="mt-2 text-zinc-600">
-                    Select a landlord to view reports.
-                  </p>
-                ) : (
-                  <>
-                    <div className="mt-2">
-                      <div className="text-lg font-semibold">
-                        {selectedLandlord.name}
-                      </div>
-                      <div className="text-sm text-zinc-600">
-                       {selectedLandlord.city}, {selectedLandlord.state}
+      <button
+        className="w-full rounded-xl border px-4 py-2 text-sm"
+        onClick={() => {
+          resetForms();
+          setView("addReport");
+        }}
+      >
+        Add report
+      </button>
+    </div>
 
-                      </div>
+    {/* REPORTS CARD */}
+    <div className="rounded-2xl border p-5">
+      {!selectedLandlord ? (
+        <p className="text-sm text-zinc-500">
+          Select a landlord on the left to view reports.
+        </p>
+      ) : (
+        <>
+          <div className="text-lg font-semibold">
+            {selectedLandlord!.name}
+          </div>
+
+          <div className="text-sm text-zinc-600 mb-4">
+            {selectedLandlord!.city}, {selectedLandlord!.state}
+          </div>
+
+          {selectedReports.length === 0 ? (
+            <p className="text-sm text-zinc-500">No reports yet.</p>
+          ) : (
+            <ul className="space-y-3">
+              {selectedReports.map((r) => (
+                <li key={r.id} className="rounded-xl border p-3">
+                  <div className="text-sm">
+                    Rating: {r.overallRating} / 5
+                  </div>
+
+                  {r.note && (
+                    <div className="text-sm text-zinc-700 mt-1">
+                      {r.note}
                     </div>
+                  )}
 
-                    <div className="mt-5">
-                      <h3 className="text-sm font-medium text-zinc-700">
-  Reports
-</h3>
+                  <div className="flex gap-3 mt-3">
+                    <button
+                      type="button"
+                      className="text-sm underline"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        verifyReport(r.id);
+                      }}
+                    >
+                      {r.status === "VERIFIED"
+                        ? "Verified"
+                        : "Mark verified"}
+                    </button>
 
+                    <button
+                      type="button"
+                      className="text-sm underline"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        removeReport(r.id);
+                      }}
+                    >
+                      Remove report
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+    </div>
+  </>
+)}
+     
 
+      <button
+        className="w-full rounded-xl border px-4 py-2 text-sm"
+        onClick={() => {
+          resetForms();
+          setView("addReport");
+        }}
+      >
+        Add report
+      </button>
+    </div>
+
+    {/* REPORTS CARD */}
+    <div className="rounded-2xl border p-5">
+      {!selectedLandlord ? (
+        <p className="text-sm text-zinc-500">
+          Select a landlord on the left to view reports.
+        </p>
+      ) : (
+        <>
+          <div className="text-lg font-semibold">
+          {selectedLandlord?.name ?? ""} 
+          </div>
+
+          <div className="text-sm text-zinc-600 mb-4">
+            {selectedLandlord.city}, {selectedLandlord.state}
+          </div>
+
+          {selectedReports.length === 0 ? (
+            <p className="text-sm text-zinc-500">No reports yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {selectedReports.map((r) => (
+                <div key={r.id} className="rounded-xl border p-3 text-sm">
+                  <div className="font-medium">Rating: {r.overallRating} / 5</div>
+                  <div className="text-zinc-600">{r.note}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  
 
                       {selectedReports.length === 0 ? (
                         <p className="mt-2 text-zinc-600">No reports yet.</p>
@@ -750,33 +851,25 @@ return (
   <button
     type="button"
     className="text-sm underline"
-    onClick={(e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      removeReport(r.id);
-    }}
-  >
-    Remove report
-  </button>
-</div>
-
-
-                               
-                            </li>
-                          ))}
-                        </ul>
-                        
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        
-      </div>
+    
+   onClick={(e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  removeReport(r.id);
+}}
+>
+Remove report</button>
+                  </div>
+                </li>
+              ))}
+                     </ul>
+          )}
+    
     </div>
+  
+
+        </div>
+      
+  </div> 
   );
 }
