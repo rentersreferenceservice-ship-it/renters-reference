@@ -394,13 +394,6 @@ const verifiedCount = reports.filter(
 ).length;
 const overall =
   totalCount === 0 ? null : Math.round((totalPoints / totalCount) * 10) / 10;
-  {overall !== null && (
-  <div className="text-sm text-zinc-700">
-    Overall rating: {overall} / 5 ({verifiedCount} verified of {totalCount})
-  </div>
-)}
-
-
 
 
 return (
@@ -688,188 +681,96 @@ return (
       </button>
     </div>
 
-    {/* REPORTS CARD */}
-    <div className="rounded-2xl border p-5">
+    {/* LANDLORD CARD */}
+    <div className="rounded-2xl border p-5 mb-4">
       {!selectedLandlord ? (
         <p className="text-sm text-zinc-500">
-          Select a landlord on the left to view reports.
+          Select a landlord on the left to view details.
         </p>
       ) : (
         <>
           <div className="text-lg font-semibold">
-            {selectedLandlord!.name}
+            {selectedLandlord.name}
           </div>
 
-          <div className="text-sm text-zinc-600 mb-4">
-            {selectedLandlord!.city}, {selectedLandlord!.state}
-          </div>
-
-          {selectedReports.length === 0 ? (
-            <p className="text-sm text-zinc-500">No reports yet.</p>
-          ) : (
-            <ul className="space-y-3">
-              {selectedReports.map((r) => (
-                <li key={r.id} className="rounded-xl border p-3">
-                  <div className="text-sm">
-                    Rating: {r.overallRating} / 5
-                  </div>
-
-                  {r.note && (
-                    <div className="text-sm text-zinc-700 mt-1">
-                      {r.note}
-                    </div>
-                  )}
-
-                  <div className="flex gap-3 mt-3">
-                    <button
-                      type="button"
-                      className="text-sm underline"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        verifyReport(r.id);
-                      }}
-                    >
-                      {r.status === "VERIFIED"
-                        ? "Verified"
-                        : "Mark verified"}
-                    </button>
-
-                    <button
-                      type="button"
-                      className="text-sm underline"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        removeReport(r.id);
-                      }}
-                    >
-                      Remove report
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
-      )}
-    </div>
-  </>
-)}
-     
-
-      <button
-        className="w-full rounded-xl border px-4 py-2 text-sm"
-        onClick={() => {
-          resetForms();
-          setView("addReport");
-        }}
-      >
-        Add report
-      </button>
-    </div>
-
-    {/* REPORTS CARD */}
-    <div className="rounded-2xl border p-5">
-      {!selectedLandlord ? (
-        <p className="text-sm text-zinc-500">
-          Select a landlord on the left to view reports.
-        </p>
-      ) : (
-        <>
-          <div className="text-lg font-semibold">
-          {selectedLandlord?.name ?? ""} 
-          </div>
-
-          <div className="text-sm text-zinc-600 mb-4">
+          <div className="text-sm text-zinc-600">
             {selectedLandlord.city}, {selectedLandlord.state}
           </div>
-
-          {selectedReports.length === 0 ? (
-            <p className="text-sm text-zinc-500">No reports yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {selectedReports.map((r) => (
-                <div key={r.id} className="rounded-xl border p-3 text-sm">
-                  <div className="font-medium">Rating: {r.overallRating} / 5</div>
-                  <div className="text-zinc-600">{r.note}</div>
-                </div>
-              ))}
-            </div>
-          )}
         </>
       )}
     </div>
-  
-
-                      {selectedReports.length === 0 ? (
-                        <p className="mt-2 text-zinc-600">No reports yet.</p>
-                      ) : (
-                        <ul className="mt-3 space-y-3">
-                          {selectedReports.map((r) => (
-                            <li key={r.id} className="rounded-xl border p-4">
-                              <div className="text-sm text-zinc-600">
-                                Repairs: {r.repairSpeed} • 
- • Deposit returned:{" "}
-{r.depositReturn === "YES"
-  ? "Yes"
-  : r.depositReturn === "NO"
-  ? "No"
-  : "Not sure"}
-                             </div>
-<div key={r.id} className="mt-1 text-sm text-zinc-600">
 
 
-  Overall rating:{" "}
-  <span aria-label={`Overall rating ${r.overallRating} out of 5`}>
-    {stars(r.overallRating)} ({r.overallRating}/5)
-  </span>
+    {/* REPORTS CARD */}
+<div className="rounded-2xl border p-5 min-h-0">
+  {selectedReports.length === 0 ? (
+    <p className="mt-2 text-zinc-600">No reports yet.</p>
+  ) : (
+    <ul className="mt-3 space-y-3">
+      {selectedReports.map((r) => (
+        <li key={r.id} className="rounded-xl border p-4">
+          <div className="text-sm text-zinc-600">
+            Repairs: {r.repairSpeed} • Deposit returned:{" "}
+            {r.depositReturn === "YES"
+              ? "Yes"
+              : r.depositReturn === "NO"
+              ? "No"
+              : "Not sure"}
+          </div>
+
+          <div className="mt-1 text-sm text-zinc-600">
+            Overall rating:{" "}
+            <span aria-label={`Overall rating ${r.overallRating} out of 5`}>
+              {stars(r.overallRating)} ({r.overallRating}/5)
+            </span>
+          </div>
+
+          {r.note && <p className="mt-2">{r.note}</p>}
+
+          <div className="mt-1 text-xs text-zinc-500">
+            Reporter: {r.confirmedRented ? "confirmed renter" : "not confirmed"}
+          </div>
+
+          <div className="text-xs text-zinc-500">
+            Admin: {r.status === "VERIFIED" ? "verified" : "pending"}
+          </div>
+
+          <div className="mt-3 flex gap-4">
+            <button
+              type="button"
+              className="text-sm underline"
+              disabled={r.status === "VERIFIED"}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                verifyReport(r.id);
+              }}
+            >
+              {r.status === "VERIFIED" ? "Verified" : "Mark verified"}
+            </button>
+
+            <button
+              type="button"
+              className="text-sm underline"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                removeReport(r.id);
+              }}
+            >
+              Remove report
+            </button>
+          </div>
+        </li>
+      ))}
+    </ul>
+  )}
 </div>
-               <p className="mt-2">{r.note}</p>
-
-<div className="mt-1 text-xs text-zinc-500">
-  Reporter: {r.confirmedRented ? "confirmed renter" : "not confirmed"}
-</div>
-
-<div className="text-xs text-zinc-500">
-  Admin: {r.status === "VERIFIED" ? "verified" : "pending"}
-</div>
- <div className="mt-3 flex gap-4">
-  <button
-    type="button"
-    className="text-sm underline"
-    disabled={r.status === "VERIFIED"}
-    onClick={(e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      verifyReport(r.id);
-    }}
-  >
-    {r.status === "VERIFIED" ? "Verified" : "Mark verified"}
-  </button>
-
-  <button
-    type="button"
-    className="text-sm underline"
-    
-   onClick={(e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  removeReport(r.id);
-}}
->
-Remove report</button>
-                  </div>
-                </li>
-              ))}
-                     </ul>
-          )}
-    
-    </div>
-  
-
+     </>
+)}
+          </div>
         </div>
-      
-  </div> 
+      </div>
+    </div>
   );
 }
