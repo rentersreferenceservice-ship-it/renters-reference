@@ -114,8 +114,10 @@ useEffect(() => {
       .select("id,name,city,state");
 console.log("LANDLORDS RESULT:", landlordsRes);
     if (!landlordsRes.error && landlordsRes.data) {
-      setLandlords(landlordsRes.data as any);
-    }
+  setLandlords(landlordsRes.data as any);
+} else {
+  console.log("LANDLORDS ERROR:", landlordsRes.error);
+}
 
     const reportsRes = await supabase
       .from("reports")
@@ -138,7 +140,7 @@ console.log("LANDLORDS RESULT:", landlordsRes);
     }
   };
 
-  run();
+ run();
 }, []);
   // load from Supabase (seeded landlords + reports)
 useEffect(() => {
