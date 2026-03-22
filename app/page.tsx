@@ -1,5 +1,6 @@
-// force production refresh
 "use client";
+// force production refresh
+
 
 import { useEffect, useMemo, useState } from "react";
 import StarRating from "@/components/StarRating";
@@ -71,7 +72,7 @@ function stars(rating: number) {
   const [filterState, setFilterState] = useState("");
   const [filterCity, setFilterCity] = useState("");
   const [filterLandlord, setFilterLandlord] = useState("");
-  const [searchName, setSearchName] = useState("");
+  
   const [reports, setReports] = useState<Report[]>([]);
 
   // UI
@@ -92,7 +93,7 @@ const [landlordType, setLandlordType] = useState<Landlord["landlordType"]>("PRIV
     useState<Report["depositReturn"]>("NOT_SURE");
   const [note, setNote] = useState("");
 const [confirmedRented, setConfirmedRented] = useState(false);
-const [searchTerm, setSearchTerm] = useState("");
+
   // load from localStorage
   useEffect(() => {
     try {
@@ -109,11 +110,14 @@ useEffect(() => {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    const landlordsRes = await supabase
-      .from("landlords")
-      .select("id,name,city,state");
+   const landlordsRes = await supabase
+  .from("landlords")
+  .select("*")
+  .range(0, 10000);
+
 console.log("LANDLORDS RESULT:", landlordsRes);
-    if (!landlordsRes.error && landlordsRes.data) {
+console.log("CT ROWS:", landlordsRes.data?.filter((l: any) => String(l.state).trim().toUpperCase() === "CT"));
+if (!landlordsRes.error && landlordsRes.data) {
   setLandlords(landlordsRes.data as any);
 } else {
   console.log("LANDLORDS ERROR:", landlordsRes.error);
@@ -121,7 +125,7 @@ console.log("LANDLORDS RESULT:", landlordsRes);
 
     const reportsRes = await supabase
       .from("reports")
-      .select("id,created_at,landlord_id,rating,report_text");
+      .select("*");
 
     if (!reportsRes.error && reportsRes.data) {
      setReports(
@@ -152,19 +156,36 @@ useEffect(() => {
       );
 
       const { data: dbLandlords, error: landlordsError } = await supabase
-        .from("landlords")
-        .select("id,name,city,state")
-        .order("name", { ascending: true })
-        .limit(1000);
-
+  .from("landlords")
+  .select("*")
+  .order("name", { ascending: true })
+  .range(0, 5000);
+console.log("CT SAMPLE ROW:", dbLandlords?.find((l: any) => String(l.state).includes("CT")));
+console.log("FIRST 50 STATES:", dbLandlords?.slice(0,50).map(l => l.state));
+console.log("LANDLORDS COUNT:", dbLandlords?.length);
+if (!landlordsError && dbLandlords) setLandlords(dbLandlords as any);
         const { data: dbReports, error: reportsError } = await supabase
         .from("reports")
-        .select("id,created_at,landlord_id,rating,report_text")
+        .select("*")
         .order("created_at", { ascending: false })
         .limit(1000);
 
-      if (!reportsError && dbReports) setReports(dbReports as any);
-
+    if (!reportsError && dbReports) {
+  setReports(
+    dbReports.map((r: any) => ({
+      id: r.id,
+      landlordId: r.landlord_id,
+      overallRating: r.rating,
+      note: r.report_text,
+      createdAt: r.created_at,
+      confirmedRented: true,
+      status: "PENDING",
+      repairSpeed: "OK",
+      depositReturn: "NOT_SURE",
+    }))
+  );
+}
+console.log("DB REPORTS:", dbReports);
       
     
     } catch {}
@@ -187,12 +208,12 @@ useEffect(() => {
   }, [selectedLandlordId, landlords]);
 const filteredLandlords = useMemo(() => {
  const s = filterState.trim().toUpperCase();
-const stateQuery = s === "MASSACHUSETTS" ? "MA" : s;
+const stateQuery = s;
   const c = filterCity.trim().toLowerCase();
  const q = filterLandlord.trim().toLowerCase();
 
   return landlords.filter((l) => {
-    const matchesState = !stateQuery || l.state.toUpperCase().includes(stateQuery);
+   const matchesState = !stateQuery || l.state?.toUpperCase().trim() === stateQuery;
     if (stateQuery === "MA") console.log("STATE CHECK", l.name, l.state, matchesState);
     const matchesCity = !c || l.city.toLowerCase().includes(c);
     const matchesName = !q || l.name.toLowerCase().includes(q);
@@ -333,22 +354,20 @@ function verifyReport(reportId: string) {
          <h2 className="text-lg font-medium">Search landlords</h2>  
 
 <div className="mt-3 grid gap-2">
-  <input
-    className="w-full rounded-xl border px-4 py-3 text-sm"
-    value={filterState}
-    list="state-options"
-    onChange={(e) => setFilterState(e.target.value)}
-    placeholder="Filter by state (e.g., NH)"
-  />
-  <datalist id="state-options">
-  <option value="MA" />
-  <option value="NH" />
-  <option value="ME" />
-  <option value="VT" />
-  <option value="CT" />
-  <option value="RI" />
-  <option value="NY" />
-</datalist>
+<select
+  className="w-full rounded-xl border px-4 py-3 text-sm"
+  value={filterState}
+  onChange={(e) => setFilterState(e.target.value)}
+>
+  <option value="">Select state</option>
+  <option value="MA">MA</option>
+  <option value="NH">NH</option>
+  <option value="ME">ME</option>
+  <option value="VT">VT</option>
+  <option value="CT">CT</option>
+  <option value="RI">RI</option>
+  <option value="NY">NY</option>
+</select>
   <input
     className="w-full rounded-xl border px-4 py-3 text-sm"
     value={filterCity}
@@ -356,31 +375,20 @@ function verifyReport(reportId: string) {
     
     placeholder="Filter by city (e.g., Manchester)"
   />
-  <input
+ <input
   className="w-full rounded-xl border px-4 py-3 text-sm"
   value={filterLandlord}
   onChange={(e) => setFilterLandlord(e.target.value)}
   placeholder="Filter by landlord name (e.g., Hamilton)"
 />
-  <input
-    className="w-full rounded-xl border px-4 py-3 text-sm"
-    value={searchName}
-    onChange={(e) => setSearchName(e.target.value)}
-    placeholder="Search landlord name"
-  />
+  
 </div>
 
             {landlords.length === 0 ? (
               <p className="mt-2 text-zinc-600">No landlords yet.</p>
         ) : (
     <>
-    <input
-      type="text"
-      placeholder="Search landlords by name, city, or state..."
-      className="mt-4 w-full rounded-xl border px-4 py-2 text-sm"
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-    />
+    
     <ul className="mt-4 space-y-3">
   {filteredLandlords.map((l) => {
     const landlordReports = reports.filter((r) => r.landlordId === l.id);
