@@ -458,6 +458,7 @@ return (
                         className="w-full text-left"
                        onClick={() => {
   setSelectedLandlordId(l.id);
+  setMobilePanel("details");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }}
                       >
