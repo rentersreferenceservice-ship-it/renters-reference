@@ -365,7 +365,7 @@ function verifyReport(reportId: string) {
     }`}
     onClick={() => setMobilePanel("list")}
   >
-    List
+    Landlords
   </button>
 
   <button
@@ -374,13 +374,22 @@ function verifyReport(reportId: string) {
     }`}
     onClick={() => setMobilePanel("details")}
   >
-    Details
+   Dashboard
   </button>
 </div>
        <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2">
           {/* LEFT: list */}
           <div className={mobilePanel === "list" ? "block" : "hidden md:block"}>
-         <h2 className="text-lg font-medium">Search landlords</h2>  
+           <div className="flex items-center justify-between">
+  <h2 className="text-lg font-medium">Search landlords</h2>
+
+  <button
+    className="rounded-xl border px-3 py-1 text-sm"
+    onClick={() => window.location.href = "mailto:WORDUPS2C@GMAIL.COM"}
+  >
+    Contact Us
+  </button>
+</div>
 
 <div className="mt-3 grid gap-2">
 <select
@@ -733,7 +742,7 @@ return (
     <div ref={rightPanelRef} className="rounded-2xl border p-5 mb-4">
       {!selectedLandlord ? (
         <p className="text-sm text-zinc-500">
-          Select a landlord on the left to view details.
+          Select a landlord to view details.
         </p>
       ) : (
         <>
