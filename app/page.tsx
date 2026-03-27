@@ -272,14 +272,41 @@ const stateQuery = s;
   setView("list");
 }
 
-  function removeLandlord(id: string) {
-    const ok = confirm("Delete this landlord and all associated reports?");
-    if (!ok) return;
+  async function removeLandlord(id: string) {
+  const ok = confirm("Delete this landlord and all associated reports?");
+  if (!ok) return;
 
-    setLandlords((prev) => prev.filter((l) => l.id !== id));
-    setReports((prev) => prev.filter((r) => r.landlordId !== id));
-    if (selectedLandlordId === id) setSelectedLandlordId(null);
-  }
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const reportsDelete = await supabase
+    .from("reports")
+    .delete()
+    .eq("landlord_id", id);
+
+  if (reportsDelete.error) {
+  console.error("Delete reports error:", reportsDelete.error);
+  alert(`Could not delete associated reports: ${reportsDelete.error.message}`);
+  return;
+}
+
+  const landlordDelete = await supabase
+    .from("landlords")
+    .delete()
+    .eq("id", id);
+
+  if (landlordDelete.error) {
+  console.error("Delete landlord error:", landlordDelete.error);
+  alert(`Could not delete landlord: ${landlordDelete.error.message}`);
+  return;
+}
+
+  setLandlords((prev) => prev.filter((l) => l.id !== id));
+  setReports((prev) => prev.filter((r) => r.landlordId !== id));
+  if (selectedLandlordId === id) setSelectedLandlordId(null);
+}
 
   async function saveReport() {
     const landlordId = reportLandlordId || selectedLandlordId || "";
@@ -329,9 +356,28 @@ function verifyReport(reportId: string) {
   );
 }
 
-  function removeReport(reportId: string) {
-    setReports((prev) => prev.filter((r) => r.id !== reportId));
+ async function removeReport(reportId: string) {
+  const ok = confirm("Delete this report?");
+  if (!ok) return;
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { error } = await supabase
+    .from("reports")
+    .delete()
+    .eq("id", reportId);
+
+  if (error) {
+    console.error("Delete report error:", error);
+    alert(`Could not delete report: ${error.message}`);
+    return;
   }
+
+  setReports((prev) => prev.filter((r) => r.id !== reportId));
+}
 
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center">
