@@ -2,7 +2,7 @@
 // force production refresh
 
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import StarRating from "@/components/StarRating";
 import { createClient } from "@supabase/supabase-js";
 
@@ -77,10 +77,20 @@ function stars(rating: number) {
 
   // UI
   const [view, setView] = useState<"list" | "addLandlord" | "addReport">("list");
-  const [selectedLandlordId, setSelectedLandlordId] = useState<string | null>(
-    null
-  );
+  const [selectedLandlordId, setSelectedLandlordId] = useState<string | null>(null);
+  const [mobilePanel, setMobilePanel] = useState<"list" | "details">("list");
+  const detailTopRef = useRef<HTMLDivElement | null>(null);
+const rightPanelRef = useRef<HTMLDivElement | null>(null);
+useEffect(() => {
+  if (!selectedLandlordId) return;
 
+  requestAnimationFrame(() => {
+    detailTopRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  });
+}, [selectedLandlordId]);
   // form fields
   const [landlordName, setLandlordName] = useState("");
   const [landlordCity, setLandlordCity] = useState("");
@@ -160,10 +170,10 @@ useEffect(() => {
   .select("*")
   .order("name", { ascending: true })
   .range(0, 5000);
-console.log("CT SAMPLE ROW:", dbLandlords?.find((l: any) => String(l.state).includes("CT")));
+console.log("DB LANDLORD STATES:", dbLandlords?.map(l => l.state));
 console.log("FIRST 50 STATES:", dbLandlords?.slice(0,50).map(l => l.state));
 console.log("LANDLORDS COUNT:", dbLandlords?.length);
-if (!landlordsError && dbLandlords) setLandlords(dbLandlords as any);
+
         const { data: dbReports, error: reportsError } = await supabase
         .from("reports")
         .select("*")
@@ -348,9 +358,28 @@ function verifyReport(reportId: string) {
         
 
         {/* MAIN */}
-       <div className="mt-4 grid gap-8 md:grid-cols-2">
+        <div className="mb-4 flex gap-2 md:hidden">
+  <button
+    className={`flex-1 rounded-xl border px-4 py-2 text-sm ${
+      mobilePanel === "list" ? "bg-black text-white" : ""
+    }`}
+    onClick={() => setMobilePanel("list")}
+  >
+    List
+  </button>
+
+  <button
+    className={`flex-1 rounded-xl border px-4 py-2 text-sm ${
+      mobilePanel === "details" ? "bg-black text-white" : ""
+    }`}
+    onClick={() => setMobilePanel("details")}
+  >
+    Details
+  </button>
+</div>
+       <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2">
           {/* LEFT: list */}
-          <div>
+          <div className={mobilePanel === "list" ? "block" : "hidden md:block"}>
          <h2 className="text-lg font-medium">Search landlords</h2>  
 
 <div className="mt-3 grid gap-2">
@@ -407,13 +436,21 @@ const overall =
 
 
 return (
-      <li key={l.id}
-       className="rounded-xl border p-4"
-      >
+      <li
+  key={l.id}
+  className="rounded-xl border p-4 cursor-pointer"
+  onClick={() => {
+    setSelectedLandlordId(l.id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }}
+>
 
                       <button
                         className="w-full text-left"
-                        onClick={() => setSelectedLandlordId(l.id)}
+                       onClick={() => {
+  setSelectedLandlordId(l.id);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}}
                       >
                         <div className="flex items-start justify-between gap-4">
                          <div>
@@ -478,14 +515,15 @@ return (
             )}
           </div>
           {/* RIGHT: details / forms */}
-          <div>
+          <div className={mobilePanel === "details" ? "block" : "hidden md:block"}>
             {view === "addLandlord" && (
               <div className="rounded-2xl border p-5">
-                <h2 className="text-lg font-medium">Add a landlord</h2>
+                
+               <h2 className="text-lg font-medium">Add a landlord</h2>
 
                 <label className="mt-4 block text-sm font-medium">
                   Landlord name
-                </label>
+                 </label>
                 <input
                   className="mt-2 w-full rounded-xl border px-4 py-3"
                   value={landlordName}
@@ -692,7 +730,7 @@ return (
     </div>
 
     {/* LANDLORD CARD */}
-    <div className="rounded-2xl border p-5 mb-4">
+    <div ref={rightPanelRef} className="rounded-2xl border p-5 mb-4">
       {!selectedLandlord ? (
         <p className="text-sm text-zinc-500">
           Select a landlord on the left to view details.
