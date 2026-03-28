@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,10 +38,12 @@ export default function RootLayout({
   }}
 ></div>
   {/* APP CONTENT */}
- <div className="min-h-screen relative z-10 bg-transparent">
+<div className="min-h-screen relative z-10 bg-transparent">
   {/* force redeploy */}
   {children}
 </div>
+
+<Analytics />
 
 </body>
 </html>
