@@ -494,11 +494,11 @@ function verifyReport(reportId: string) {
   <h2 className="text-lg font-medium">Search landlords</h2>
 
   <button
-    className="rounded-xl border px-3 py-1 text-sm"
-    onClick={() => window.location.href = "mailto:WORDUPS2C@GMAIL.COM"}
-  >
-    Contact Us
-  </button>
+  className="rounded-xl border px-3 py-1 text-sm"
+  onClick={() => window.location.href = "mailto:rentersreferenceservice@gmail.com"}
+>
+  Contact Us
+</button>
 </div>
 
 <div className="mt-3 grid gap-2">
