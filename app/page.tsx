@@ -59,11 +59,7 @@ function stars(rating: number) {
     </>
   );
 }
-
-  
- 
-
-  export default function Home() {
+export default function Home() {
     
   // data
   
@@ -114,63 +110,68 @@ const [confirmedRented, setConfirmedRented] = useState(false);
   }, []);
   // load from Supabase
 useEffect(() => {
-  const run = async () => {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-
-    const landlordsRes = await supabase
-      .from("landlords")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(20000);
-
-    console.log("FETCH LANDLORDS RESULT", landlordsRes);
-    console.log("FETCH LANDLORDS DATA", landlordsRes.data);
-
-    if (!landlordsRes.error && landlordsRes.data) {
-     setLandlords(
-  landlordsRes.data.map((l: any) => ({
-    id: l.id,
-    name: l.name,
-    state: l.state,
-    city: l.city,
-    landlordType: "PRIVATE",
-    createdAt: l.created_at ?? new Date().toISOString(),
-  })) as any
-); 
-    } else {
-      console.log("LANDLORDS ERROR:", landlordsRes.error);
-    }
-
-    const reportsRes = await supabase
-      .from("reports")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(20000);
-
-    console.log("FETCH REPORTS RESULT", reportsRes);
-    console.log("FETCH REPORTS DATA", reportsRes.data);
-
-    if (!reportsRes.error && reportsRes.data) {
-      setReports(
-        reportsRes.data.map((r: any) => ({
-          id: r.id,
-          landlordId: r.landlord_id,
-          overallRating: r.overall_rating ?? r.rating ?? 0,
-          note: r.note ?? r.report_text ?? "",
-          createdAt: r.created_at,
-          confirmedRented: r.confirmed_rented ?? true,
-          status: r.status ?? "PENDING",
-          repairSpeed: r.repair_speed ?? "OK",
-          depositReturn: r.deposit_return ?? "NOT_SURE",
-        })) as any
+  async function run() {
+    try {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
-    } else {
-      console.log("REPORTS ERROR:", reportsRes.error);
+
+      const landlordsRes = await supabase
+        .from("landlords")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20000);
+
+      console.log("FETCH LANDLORDS RESULT", landlordsRes);
+      console.log("FETCH LANDLORDS DATA", landlordsRes.data);
+
+      if (!landlordsRes.error && landlordsRes.data) {
+        setLandlords(
+          landlordsRes.data.map((l: any) => ({
+            id: l.id,
+            name: l.name,
+            country: "US",
+            state: l.state,
+            city: l.city,
+            landlordType: "PRIVATE",
+            createdAt: l.created_at ?? new Date().toISOString(),
+          })) as any
+        );
+      } else {
+        console.log("LANDLORDS ERROR:", landlordsRes.error);
+      }
+
+      const reportsRes = await supabase
+        .from("reports")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20000);
+
+      console.log("FETCH REPORTS RESULT", reportsRes);
+      console.log("FETCH REPORTS DATA", reportsRes.data);
+
+      if (!reportsRes.error && reportsRes.data) {
+        setReports(
+          reportsRes.data.map((r: any) => ({
+            id: r.id,
+            landlordId: r.landlord_id,
+            overallRating: r.overall_rating ?? r.rating ?? 0,
+            note: r.note ?? r.report_text ?? "",
+            createdAt: r.created_at,
+            confirmedRented: r.confirmed_rented ?? true,
+            status: r.status ?? "PENDING",
+            repairSpeed: r.repair_speed ?? "OK",
+            depositReturn: r.deposit_return ?? "NOT_SURE",
+          })) as any
+        );
+      } else {
+        console.log("REPORTS ERROR:", reportsRes.error);
+      }
+    } catch (err) {
+      console.error("LOAD DATA ERROR:", err);
     }
-  };
+  }
 
   run();
 }, []);
@@ -311,6 +312,7 @@ const stateQuery = s;
  const newLandlord: Landlord = {
   id: row.id,
   name: row.name,
+  country: "US",
   state: row.state,
   city: row.city,
   landlordType: "PRIVATE",
@@ -325,9 +327,16 @@ const stateQuery = s;
   alert(`Saved landlord: ${newLandlord.name}`);
 }
 
-  async function removeLandlord(id: string) {
+ async function removeLandlord(id: string | number) {
   const ok = confirm("Delete this landlord and all associated reports?");
   if (!ok) return;
+
+  const numericId = Number(id);
+
+  if (!Number.isFinite(numericId)) {
+    alert("This landlord has an old local-only ID and is not stored in the database. Refresh the page to clear it.");
+    return;
+  }
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -337,30 +346,32 @@ const stateQuery = s;
   const reportsDelete = await supabase
     .from("reports")
     .delete()
-    .eq("landlord_id", id);
+    .eq("landlord_id", numericId);
 
   if (reportsDelete.error) {
-  console.error("Delete reports error:", reportsDelete.error);
-  alert(`Could not delete associated reports: ${reportsDelete.error.message}`);
-  return;
-}
+    console.error("Delete reports error:", reportsDelete.error);
+    alert(`Could not delete associated reports: ${reportsDelete.error.message}`);
+    return;
+  }
 
   const landlordDelete = await supabase
     .from("landlords")
     .delete()
-    .eq("id", id);
+    .eq("id", numericId);
 
   if (landlordDelete.error) {
-  console.error("Delete landlord error:", landlordDelete.error);
-  alert(`Could not delete landlord: ${landlordDelete.error.message}`);
-  return;
-}
+    console.error("Delete landlord error:", landlordDelete.error);
+    alert(`Could not delete landlord: ${landlordDelete.error.message}`);
+    return;
+  }
 
-  setLandlords((prev) => prev.filter((l) => l.id !== id));
-  setReports((prev) => prev.filter((r) => r.landlordId !== id));
-  if (selectedLandlordId === id) setSelectedLandlordId(null);
+ 
+  setLandlords((prev) => prev.filter((l) => Number(l.id) !== numericId));
+ setReports((prev) => prev.filter((r) => Number(r.landlordId) !== numericId));
+ if (selectedLandlordId !== null && Number(selectedLandlordId) === numericId) {
+  setSelectedLandlordId(null);
 }
-
+ }
   async function saveReport() {
     const landlordId = reportLandlordId || selectedLandlordId || "";
     if (!landlordId) return alert("Please choose a landlord first.");
