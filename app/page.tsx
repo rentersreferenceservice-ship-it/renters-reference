@@ -120,41 +120,59 @@ useEffect(() => {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-   const landlordsRes = await supabase
-  .from("landlords")
-  .select("*")
-  .range(0, 10000);
+    const landlordsRes = await supabase
+      .from("landlords")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(20000);
 
-console.log("LANDLORDS RESULT:", landlordsRes);
-console.log("CT ROWS:", landlordsRes.data?.filter((l: any) => String(l.state).trim().toUpperCase() === "CT"));
-if (!landlordsRes.error && landlordsRes.data) {
-  setLandlords(landlordsRes.data as any);
-} else {
-  console.log("LANDLORDS ERROR:", landlordsRes.error);
-}
+    console.log("FETCH LANDLORDS RESULT", landlordsRes);
+    console.log("FETCH LANDLORDS DATA", landlordsRes.data);
+
+    if (!landlordsRes.error && landlordsRes.data) {
+     setLandlords(
+  landlordsRes.data.map((l: any) => ({
+    id: l.id,
+    name: l.name,
+    state: l.state,
+    city: l.city,
+    landlordType: "PRIVATE",
+    createdAt: l.created_at ?? new Date().toISOString(),
+  })) as any
+); 
+    } else {
+      console.log("LANDLORDS ERROR:", landlordsRes.error);
+    }
 
     const reportsRes = await supabase
       .from("reports")
-      .select("*");
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(20000);
+
+    console.log("FETCH REPORTS RESULT", reportsRes);
+    console.log("FETCH REPORTS DATA", reportsRes.data);
 
     if (!reportsRes.error && reportsRes.data) {
-     setReports(
-  reportsRes.data.map((r: any) => ({
-    id: r.id,
-    landlordId: r.landlord_id,
-    overallRating: r.rating,
-    note: r.report_text,
-    createdAt: r.created_at,
-    confirmedRented: true,
-    status: "PENDING",
-    repairSpeed: "OK",
-    depositReturn: "NOT_SURE",
-  })) as any
-);
+      setReports(
+        reportsRes.data.map((r: any) => ({
+          id: r.id,
+          landlordId: r.landlord_id,
+          overallRating: r.overall_rating ?? r.rating ?? 0,
+          note: r.note ?? r.report_text ?? "",
+          createdAt: r.created_at,
+          confirmedRented: r.confirmed_rented ?? true,
+          status: r.status ?? "PENDING",
+          repairSpeed: r.repair_speed ?? "OK",
+          depositReturn: r.deposit_return ?? "NOT_SURE",
+        })) as any
+      );
+    } else {
+      console.log("REPORTS ERROR:", reportsRes.error);
     }
   };
 
- run();
+  run();
 }, []);
   // load from Supabase (seeded landlords + reports)
 useEffect(() => {
@@ -248,7 +266,7 @@ const stateQuery = s;
   setConfirmedRented(false);
 }
 
-    function saveLandlord() {
+  async function saveLandlord() {
   const name = landlordName.trim();
   const city = landlordCity.trim();
   const state = landlordState.trim().toUpperCase();
@@ -257,19 +275,54 @@ const stateQuery = s;
   if (!city) return alert("Please enter a city.");
   if (!state) return alert("Please enter a state.");
 
-  const newLandlord: Landlord = {
-    id: uid(),
-    name,
-    country: "US",
-    state,
-    city,
-    landlordType,
-    createdAt: new Date().toISOString(),
-  };
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+ const payload = {
+  name,
+  city,
+  state,
+};
+  console.log("SAVE LANDLORD PAYLOAD", payload);
+  console.log("SUPABASE URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
+
+  const { data, error } = await supabase
+    .from("landlords")
+    .insert([payload])
+    .select("*");
+
+  console.log("SAVE LANDLORD RESPONSE", { data, error });
+
+  if (error) {
+    console.error("Save landlord error:", error);
+    alert(`Could not save landlord: ${error.message}`);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    alert("Insert returned no row. Check RLS or table schema.");
+    return;
+  }
+
+  const row = data[0];
+
+ const newLandlord: Landlord = {
+  id: row.id,
+  name: row.name,
+  state: row.state,
+  city: row.city,
+  landlordType: "PRIVATE",
+  createdAt: row.created_at ?? new Date().toISOString(),
+};
 
   setLandlords((prev) => [newLandlord, ...prev]);
   resetForms();
+  setSelectedLandlordId(newLandlord.id);
+  setReportLandlordId(newLandlord.id);
   setView("list");
+  alert(`Saved landlord: ${newLandlord.name}`);
 }
 
   async function removeLandlord(id: string) {
