@@ -689,6 +689,12 @@ return (
   <option value="WI">Wisconsin</option>
   <option value="WY">Wyoming</option>
 </select>
+<input
+  className="w-full rounded-xl border px-4 py-3 text-sm"
+  value={filterCity}
+  onChange={(e) => setFilterCity(e.target.value)}
+  placeholder="Filter by city"
+/>
 <label className="mt-4 block text-sm font-medium">State</label>
 <input
   className="mt-2 w-full rounded-xl border px-4 py-3"
