@@ -501,13 +501,6 @@ function verifyReport(reportId: string) {
 </div>
 
 <div className="mt-3 grid gap-2">
-  <input
-    className="w-full rounded-xl border px-4 py-3 text-sm"
-    value={filterLandlord}
-    onChange={(e) => setFilterLandlord(e.target.value)}
-    placeholder="Filter by landlord name (e.g., Hamilton)"
-  />
-
   <select
     className="w-full rounded-xl border px-4 py-3 text-sm"
     value={filterState}
@@ -571,6 +564,13 @@ function verifyReport(reportId: string) {
     value={filterCity}
     onChange={(e) => setFilterCity(e.target.value)}
     placeholder="Filter by city"
+  />
+
+  <input
+    className="w-full rounded-xl border px-4 py-3 text-sm"
+    value={filterLandlord}
+    onChange={(e) => setFilterLandlord(e.target.value)}
+    placeholder="Filter by landlord name (e.g., Hamilton)"
   />
 </div>
 
