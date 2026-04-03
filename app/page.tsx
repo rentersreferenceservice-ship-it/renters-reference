@@ -25,6 +25,7 @@ type Report = {
   status: "PENDING" | "VERIFIED";
  repairSpeed: "FAST" | "OK" | "SLOW";
   depositReturn: "YES" | "NO" | "NOT_SURE";
+  allowsPets: "YES" | "NO" | "NOT_SURE";
   note: string;
   createdAt: string; // submission date (tenant-visible later)
 };
@@ -116,6 +117,8 @@ const [landlordType, setLandlordType] = useState<Landlord["landlordType"]>("PRIV
   const [repairSpeed, setRepairSpeed] = useState<Report["repairSpeed"]>("OK");
   const [depositReturn, setDepositReturn] =
     useState<Report["depositReturn"]>("NOT_SURE");
+  const [allowsPets, setAllowsPets] =
+    useState<Report["allowsPets"]>("NOT_SURE");
   const [note, setNote] = useState("");
 const [confirmedRented, setConfirmedRented] = useState(false);
 
@@ -186,6 +189,7 @@ useEffect(() => {
             status: r.status ?? "PENDING",
             repairSpeed: r.repair_speed ?? "OK",
             depositReturn: r.deposit_return ?? "NOT_SURE",
+            allowsPets: r.allows_pets ?? "NOT_SURE",
           })) as any
         );
       } else {
@@ -242,6 +246,7 @@ const filteredLandlords = useMemo(() => {
   setReportLandlordId("");
   setRepairSpeed("OK");
   setDepositReturn("NOT_SURE");
+  setAllowsPets("NOT_SURE");
   setNote("");
   setConfirmedRented(false);
 }
@@ -365,6 +370,7 @@ const filteredLandlords = useMemo(() => {
       status: "PENDING",
       repairSpeed,
       depositReturn,
+      allowsPets,
       note: note.trim(),
       createdAt: new Date().toISOString(),
     };
@@ -838,6 +844,19 @@ onChange={(e) => setLandlordState(e.target.value)}
                 </select>
 
                 <label className="mt-4 block text-sm font-medium">
+                  Allows pets?
+                </label>
+                <select
+                  className="mt-2 w-full rounded-xl border px-4 py-3"
+                  value={allowsPets}
+                  onChange={(e) => setAllowsPets(e.target.value as Report["allowsPets"])}
+                >
+                  <option value="YES">YES</option>
+                  <option value="NO">NO</option>
+                  <option value="NOT_SURE">NOT SURE</option>
+                </select>
+
+                <label className="mt-4 block text-sm font-medium">
                   Short note (1–2 sentences)
                 </label>
                <div className="text-xs text-zinc-500">
@@ -945,6 +964,12 @@ onChange={(e) => setLandlordState(e.target.value)}
             {r.depositReturn === "YES"
               ? "Yes"
               : r.depositReturn === "NO"
+              ? "No"
+              : "Not sure"}{" "}
+            • Allows pets:{" "}
+            {r.allowsPets === "YES"
+              ? "Yes"
+              : r.allowsPets === "NO"
               ? "No"
               : "Not sure"}
           </div>
