@@ -15,7 +15,6 @@ type Landlord = {
  landlordType: "PRIVATE" | "MANAGEMENT" | "AIRBNB" | "OTHER";
   createdAt: string;
 };
-<option value="AIRBNB">Airbnb / Short-term</option>
 
 type Report = {
   id: string;
@@ -634,8 +633,8 @@ return (
                <label className="mt-4 block text-sm font-medium">State</label>
 <select
   className="w-full rounded-xl border px-4 py-3 text-sm"
-  value={filterState}
-  onChange={(e) => setFilterState(e.target.value)}
+  value={landlordState}
+onChange={(e) => setLandlordState(e.target.value)}
 >
   <option value="">All States</option>
   <option value="AL">Alabama</option>
