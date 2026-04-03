@@ -188,17 +188,14 @@ useEffect(() => {
     return landlords.find((l) => l.id === selectedLandlordId) ?? null;
   }, [selectedLandlordId, landlords]);
 const filteredLandlords = useMemo(() => {
- const s = filterState.trim().toUpperCase();
-const stateQuery = s;
+  const stateQuery = filterState.trim().toUpperCase();
   const c = filterCity.trim().toLowerCase();
- const q = filterLandlord.trim().toLowerCase();
+  const q = filterLandlord.trim().toLowerCase();
 
   return landlords.filter((l) => {
-   const matchesState = !stateQuery || l.state?.toUpperCase().trim() === stateQuery;
-    if (stateQuery === "MA") console.log("STATE CHECK", l.name, l.state, matchesState);
-    const matchesCity = !c || l.city?.toLowerCase().includes(c);
-    const matchesName = !q || l.name?.toLowerCase().includes(q);
-   if (filterState === "MA") return matchesState && matchesCity && matchesName;
+    const matchesState = !stateQuery || (l.state ?? "").toUpperCase().trim() === stateQuery;
+    const matchesCity = !c || (l.city ?? "").toLowerCase().includes(c);
+    const matchesName = !q || (l.name ?? "").toLowerCase().includes(q);
     return matchesState && matchesCity && matchesName;
   });
 }, [landlords, filterState, filterCity, filterLandlord]);
