@@ -526,9 +526,13 @@ function verifyReport(reportId: string) {
 
             {landlords.length === 0 ? (
               <p className="mt-2 text-zinc-600">No landlords yet.</p>
+        ) : !filterState && !filterCity && !filterLandlord ? (
+          <p className="mt-4 text-sm text-zinc-500">Select a state or enter a name to find landlords.</p>
+        ) : filteredLandlords.length === 0 ? (
+          <p className="mt-4 text-sm text-zinc-500">No landlords found for that search.</p>
         ) : (
     <>
-    
+
     <ul className="mt-4 space-y-3">
   {filteredLandlords.map((l) => {
     const landlordReports = reports.filter((r) => r.landlordId === l.id);
