@@ -243,8 +243,8 @@ const stateQuery = s;
   return landlords.filter((l) => {
    const matchesState = !stateQuery || l.state?.toUpperCase().trim() === stateQuery;
     if (stateQuery === "MA") console.log("STATE CHECK", l.name, l.state, matchesState);
-    const matchesCity = !c || l.city.toLowerCase().includes(c);
-    const matchesName = !q || l.name.toLowerCase().includes(q);
+    const matchesCity = !c || l.city?.toLowerCase().includes(c);
+    const matchesName = !q || l.name?.toLowerCase().includes(q);
    if (filterState === "MA") return matchesState && matchesCity && matchesName;
     return matchesState && matchesCity && matchesName;
   });
