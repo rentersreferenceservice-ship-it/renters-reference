@@ -501,14 +501,77 @@ function verifyReport(reportId: string) {
 </div>
 
 <div className="mt-3 grid gap-2">
+  <input
+    className="w-full rounded-xl border px-4 py-3 text-sm"
+    value={filterLandlord}
+    onChange={(e) => setFilterLandlord(e.target.value)}
+    placeholder="Filter by landlord name (e.g., Hamilton)"
+  />
 
- <input
-  className="w-full rounded-xl border px-4 py-3 text-sm"
-  value={filterLandlord}
-  onChange={(e) => setFilterLandlord(e.target.value)}
-  placeholder="Filter by landlord name (e.g., Hamilton)"
-/>
-  
+  <select
+    className="w-full rounded-xl border px-4 py-3 text-sm"
+    value={filterState}
+    onChange={(e) => setFilterState(e.target.value)}
+  >
+    <option value="">All States</option>
+    <option value="AL">Alabama</option>
+    <option value="AK">Alaska</option>
+    <option value="AZ">Arizona</option>
+    <option value="AR">Arkansas</option>
+    <option value="CA">California</option>
+    <option value="CO">Colorado</option>
+    <option value="CT">Connecticut</option>
+    <option value="DE">Delaware</option>
+    <option value="FL">Florida</option>
+    <option value="GA">Georgia</option>
+    <option value="HI">Hawaii</option>
+    <option value="ID">Idaho</option>
+    <option value="IL">Illinois</option>
+    <option value="IN">Indiana</option>
+    <option value="IA">Iowa</option>
+    <option value="KS">Kansas</option>
+    <option value="KY">Kentucky</option>
+    <option value="LA">Louisiana</option>
+    <option value="ME">Maine</option>
+    <option value="MD">Maryland</option>
+    <option value="MA">Massachusetts</option>
+    <option value="MI">Michigan</option>
+    <option value="MN">Minnesota</option>
+    <option value="MS">Mississippi</option>
+    <option value="MO">Missouri</option>
+    <option value="MT">Montana</option>
+    <option value="NE">Nebraska</option>
+    <option value="NV">Nevada</option>
+    <option value="NH">New Hampshire</option>
+    <option value="NJ">New Jersey</option>
+    <option value="NM">New Mexico</option>
+    <option value="NY">New York</option>
+    <option value="NC">North Carolina</option>
+    <option value="ND">North Dakota</option>
+    <option value="OH">Ohio</option>
+    <option value="OK">Oklahoma</option>
+    <option value="OR">Oregon</option>
+    <option value="PA">Pennsylvania</option>
+    <option value="RI">Rhode Island</option>
+    <option value="SC">South Carolina</option>
+    <option value="SD">South Dakota</option>
+    <option value="TN">Tennessee</option>
+    <option value="TX">Texas</option>
+    <option value="UT">Utah</option>
+    <option value="VT">Vermont</option>
+    <option value="VA">Virginia</option>
+    <option value="WA">Washington</option>
+    <option value="WV">West Virginia</option>
+    <option value="WI">Wisconsin</option>
+    <option value="WY">Wyoming</option>
+  </select>
+
+  <input
+    className="w-full rounded-xl border px-4 py-3 text-sm"
+    value={filterCity}
+    onChange={(e) => setFilterCity(e.target.value)}
+    placeholder="Filter by city"
+  />
 </div>
 
             {landlords.length === 0 ? (
@@ -692,9 +755,9 @@ onChange={(e) => setLandlordState(e.target.value)}
 <label className="mt-4 block text-sm font-medium">City</label>
 <input
   className="w-full rounded-xl border px-4 py-3 text-sm"
-  value={filterCity}
-  onChange={(e) => setFilterCity(e.target.value)}
-  placeholder="Filter by city"
+  value={landlordCity}
+  onChange={(e) => setLandlordCity(e.target.value)}
+  placeholder="e.g., Boston"
 />
 
                 <div className="mt-5 flex gap-3">
