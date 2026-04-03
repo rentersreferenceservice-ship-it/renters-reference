@@ -25,7 +25,9 @@ type Report = {
   status: "PENDING" | "VERIFIED";
  repairSpeed: "FAST" | "OK" | "SLOW";
   depositReturn: "YES" | "NO" | "NOT_SURE";
-  allowsPets: "YES" | "NO" | "NOT_SURE";
+  allowsPets: boolean;
+  heatIncluded: boolean;
+  utilitiesIncluded: boolean;
   note: string;
   createdAt: string; // submission date (tenant-visible later)
 };
@@ -117,8 +119,9 @@ const [landlordType, setLandlordType] = useState<Landlord["landlordType"]>("PRIV
   const [repairSpeed, setRepairSpeed] = useState<Report["repairSpeed"]>("OK");
   const [depositReturn, setDepositReturn] =
     useState<Report["depositReturn"]>("NOT_SURE");
-  const [allowsPets, setAllowsPets] =
-    useState<Report["allowsPets"]>("NOT_SURE");
+  const [allowsPets, setAllowsPets] = useState(false);
+  const [heatIncluded, setHeatIncluded] = useState(false);
+  const [utilitiesIncluded, setUtilitiesIncluded] = useState(false);
   const [note, setNote] = useState("");
 const [confirmedRented, setConfirmedRented] = useState(false);
 
@@ -189,7 +192,9 @@ useEffect(() => {
             status: r.status ?? "PENDING",
             repairSpeed: r.repair_speed ?? "OK",
             depositReturn: r.deposit_return ?? "NOT_SURE",
-            allowsPets: r.allows_pets ?? "NOT_SURE",
+            allowsPets: r.allows_pets ?? false,
+            heatIncluded: r.heat_included ?? false,
+            utilitiesIncluded: r.utilities_included ?? false,
           })) as any
         );
       } else {
@@ -246,7 +251,9 @@ const filteredLandlords = useMemo(() => {
   setReportLandlordId("");
   setRepairSpeed("OK");
   setDepositReturn("NOT_SURE");
-  setAllowsPets("NOT_SURE");
+  setAllowsPets(false);
+  setHeatIncluded(false);
+  setUtilitiesIncluded(false);
   setNote("");
   setConfirmedRented(false);
 }
@@ -371,6 +378,8 @@ const filteredLandlords = useMemo(() => {
       repairSpeed,
       depositReturn,
       allowsPets,
+      heatIncluded,
+      utilitiesIncluded,
       note: note.trim(),
       createdAt: new Date().toISOString(),
     };
@@ -843,18 +852,20 @@ onChange={(e) => setLandlordState(e.target.value)}
                   <option value="NOT_SURE">NOT SURE</option>
                 </select>
 
-                <label className="mt-4 block text-sm font-medium">
-                  Allows pets?
-                </label>
-                <select
-                  className="mt-2 w-full rounded-xl border px-4 py-3"
-                  value={allowsPets}
-                  onChange={(e) => setAllowsPets(e.target.value as Report["allowsPets"])}
-                >
-                  <option value="YES">YES</option>
-                  <option value="NO">NO</option>
-                  <option value="NOT_SURE">NOT SURE</option>
-                </select>
+                <div className="mt-4 space-y-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="h-4 w-4" checked={allowsPets} onChange={(e) => setAllowsPets(e.target.checked)} />
+                    Allows pets
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="h-4 w-4" checked={heatIncluded} onChange={(e) => setHeatIncluded(e.target.checked)} />
+                    Heat included
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="h-4 w-4" checked={utilitiesIncluded} onChange={(e) => setUtilitiesIncluded(e.target.checked)} />
+                    Utilities included
+                  </label>
+                </div>
 
                 <label className="mt-4 block text-sm font-medium">
                   Short note (1–2 sentences)
@@ -966,12 +977,9 @@ onChange={(e) => setLandlordState(e.target.value)}
               : r.depositReturn === "NO"
               ? "No"
               : "Not sure"}{" "}
-            • Allows pets:{" "}
-            {r.allowsPets === "YES"
-              ? "Yes"
-              : r.allowsPets === "NO"
-              ? "No"
-              : "Not sure"}
+            • Allows pets: {r.allowsPets ? "Yes" : "No"}{" "}
+            • Heat included: {r.heatIncluded ? "Yes" : "No"}{" "}
+            • Utilities included: {r.utilitiesIncluded ? "Yes" : "No"}
           </div>
 
           <div className="mt-1 text-sm text-zinc-600">
