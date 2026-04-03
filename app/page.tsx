@@ -136,18 +136,24 @@ useEffect(() => {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
 
-      const landlordsRes = await supabase
-        .from("landlords")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(20000);
+      let allLandlords: any[] = [];
+      let from = 0;
+      const batchSize = 1000;
+      while (true) {
+        const { data, error } = await supabase
+          .from("landlords")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .range(from, from + batchSize - 1);
+        if (error || !data || data.length === 0) break;
+        allLandlords = allLandlords.concat(data);
+        if (data.length < batchSize) break;
+        from += batchSize;
+      }
 
-      console.log("FETCH LANDLORDS RESULT", landlordsRes);
-      console.log("FETCH LANDLORDS DATA", landlordsRes.data);
-
-      if (!landlordsRes.error && landlordsRes.data) {
+      if (allLandlords.length > 0) {
         setLandlords(
-          landlordsRes.data.map((l: any) => ({
+          allLandlords.map((l: any) => ({
             id: l.id,
             name: l.name,
             country: "US",
@@ -157,8 +163,6 @@ useEffect(() => {
             createdAt: l.created_at ?? new Date().toISOString(),
           })) as any
         );
-      } else {
-        console.log("LANDLORDS ERROR:", landlordsRes.error);
       }
 
       const reportsRes = await supabase
