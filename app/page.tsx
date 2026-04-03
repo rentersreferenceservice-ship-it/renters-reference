@@ -631,7 +631,7 @@ return (
                   placeholder="Example: Jordan Smith / Maple Properties"
                 />
 
-                <label className="mt-4 block text-sm font-medium">City</label>
+               <label className="mt-4 block text-sm font-medium">State</label>
 <select
   className="w-full rounded-xl border px-4 py-3 text-sm"
   value={filterState}
@@ -689,31 +689,14 @@ return (
   <option value="WI">Wisconsin</option>
   <option value="WY">Wyoming</option>
 </select>
+
+<label className="mt-4 block text-sm font-medium">City</label>
 <input
   className="w-full rounded-xl border px-4 py-3 text-sm"
   value={filterCity}
   onChange={(e) => setFilterCity(e.target.value)}
   placeholder="Filter by city"
 />
-<label className="mt-4 block text-sm font-medium">State</label>
-<input
-  className="mt-2 w-full rounded-xl border px-4 py-3"
-  value={landlordState}
-  onChange={(e) => setLandlordState(e.target.value)}
-  placeholder="Example: VT"
-  />
-
-<label className="mt-4 block text-sm font-medium">Landlord type</label>
-<select
-  className="mt-2 w-full rounded-xl border px-4 py-3"
-  value={landlordType}
-  onChange={(e) => setLandlordType(e.target.value as Landlord["landlordType"])}
->
-  <option value="PRIVATE">Private owner</option>
-  <option value="MANAGEMENT">Management company</option>
-  <option value="OTHER">Other / Not sure</option>
-  <option value="SHORT_TERM">Short-term rental (Airbnb / Vrbo)</option>
-</select>
 
                 <div className="mt-5 flex gap-3">
                   <button
