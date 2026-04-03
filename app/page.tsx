@@ -216,13 +216,19 @@ const filteredLandlords = useMemo(() => {
   const c = filterCity.trim().toLowerCase();
   const q = filterLandlord.trim().toLowerCase();
 
-  return landlords.filter((l) => {
-    const matchesState = !stateQuery || (l.state ?? "").toUpperCase().trim() === stateQuery;
-    const matchesCity = !c || (l.city ?? "").toLowerCase().includes(c);
-    const matchesName = !q || (l.name ?? "").toLowerCase().includes(q);
-    return matchesState && matchesCity && matchesName;
-  });
-}, [landlords, filterState, filterCity, filterLandlord]);
+  return landlords
+    .filter((l) => {
+      const matchesState = !stateQuery || (l.state ?? "").toUpperCase().trim() === stateQuery;
+      const matchesCity = !c || (l.city ?? "").toLowerCase().includes(c);
+      const matchesName = !q || (l.name ?? "").toLowerCase().includes(q);
+      return matchesState && matchesCity && matchesName;
+    })
+    .sort((a, b) => {
+      const aHasReports = reports.some((r) => r.landlordId === a.id) ? 1 : 0;
+      const bHasReports = reports.some((r) => r.landlordId === b.id) ? 1 : 0;
+      return bHasReports - aHasReports;
+    });
+}, [landlords, reports, filterState, filterCity, filterLandlord]);
 
   const selectedReports = useMemo(() => {
     if (!selectedLandlordId) return [];
