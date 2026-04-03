@@ -544,6 +544,10 @@ function verifyReport(reportId: string) {
   />
 </div>
 
+            <p className="mt-2 text-xs text-zinc-400">
+              Debug: filterState="{filterState}" | total landlords={landlords.length} | filtered={filteredLandlords.length} | sample states: {landlords.slice(0,3).map(l=>l.state).join(", ")}
+            </p>
+
             {landlords.length === 0 ? (
               <p className="mt-2 text-zinc-600">No landlords yet.</p>
         ) : filteredLandlords.length === 0 ? (
