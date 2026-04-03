@@ -174,53 +174,6 @@ useEffect(() => {
 
   run();
 }, []);
-  // load from Supabase (seeded landlords + reports)
-useEffect(() => {
-  const run = async () => {
-    try {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-
-      const { data: dbLandlords, error: landlordsError } = await supabase
-  .from("landlords")
-  .select("*")
-  .order("name", { ascending: true })
-  .range(0, 5000);
-console.log("DB LANDLORD STATES:", dbLandlords?.map(l => l.state));
-console.log("FIRST 50 STATES:", dbLandlords?.slice(0,50).map(l => l.state));
-console.log("LANDLORDS COUNT:", dbLandlords?.length);
-
-        const { data: dbReports, error: reportsError } = await supabase
-        .from("reports")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(1000);
-
-    if (!reportsError && dbReports) {
-  setReports(
-    dbReports.map((r: any) => ({
-      id: r.id,
-      landlordId: r.landlord_id,
-      overallRating: r.rating,
-      note: r.report_text,
-      createdAt: r.created_at,
-      confirmedRented: true,
-      status: "PENDING",
-      repairSpeed: "OK",
-      depositReturn: "NOT_SURE",
-    }))
-  );
-}
-console.log("DB REPORTS:", dbReports);
-      
-    
-    } catch {}
-  };
-
-  run();
-}, []);
 // load from localStorage
   // persist to localStorage
   useEffect(() => {
