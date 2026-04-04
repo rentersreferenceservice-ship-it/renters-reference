@@ -520,7 +520,7 @@ async function submitVerification(landlordId: string) {
               Login
             </a>
             <button
-              className="rounded-xl px-4 py-2 text-sm text-white" style={{ backgroundColor: "#EAB308" }}
+              className="rounded-xl px-4 py-2 text-sm text-zinc-800" style={{ backgroundColor: "#F5D87A" }}
               onClick={() => { setClaimModalOpen(true); setClaimSearch(""); }}
             >
               Landlords: Claim Your Profile
@@ -579,7 +579,7 @@ async function submitVerification(landlordId: string) {
                         <span className="rounded-xl bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-700">Verification In Process</span>
                       ) : (
                         <button
-                          className="rounded-xl px-3 py-1.5 text-xs text-white" style={{ backgroundColor: "#EAB308" }}
+                          className="rounded-xl px-3 py-1.5 text-xs text-zinc-800" style={{ backgroundColor: "#F5D87A" }}
                           onClick={() => { setClaimModalOpen(false); setVerifyModalLandlordId(l.id); setVBizName(l.name); }}
                         >
                           Claim
@@ -632,7 +632,7 @@ async function submitVerification(landlordId: string) {
                   <div className="mt-5 flex gap-3">
                     <button
                       className="flex-1 rounded-xl px-4 py-2 text-sm text-white"
-                      style={{ backgroundColor: "#EAB308" }}
+                      style={{ backgroundColor: "#F5D87A" }}
                       onClick={() => {
                         if (!vBizName.trim() || !vAddress.trim() || !vPhone.trim() || !vEmail.trim()) {
                           alert("Please fill in all required fields.");
@@ -666,7 +666,7 @@ async function submitVerification(landlordId: string) {
                     <button className="rounded-xl border px-4 py-2 text-sm" onClick={() => setVerifyStep(1)}>← Back</button>
                     <button
                       className="flex-1 rounded-xl px-4 py-2 text-sm text-white"
-                      style={{ backgroundColor: "#EAB308" }}
+                      style={{ backgroundColor: "#F5D87A" }}
                       onClick={() => submitVerification(verifyModalLandlordId)}
                     >
                       Pay $29.99 &amp; Verify
@@ -887,7 +887,7 @@ return (
                           </span>
                         ) : (
                           <button
-                            className="rounded-xl px-3 py-1 text-xs text-white" style={{ backgroundColor: "#EAB308" }}
+                            className="rounded-xl px-3 py-1 text-xs text-zinc-800" style={{ backgroundColor: "#F5D87A" }}
                             onClick={(e) => { e.stopPropagation(); setVerifyModalLandlordId(l.id); setVBizName(l.name); }}
                           >
                             Claim &amp; Verify Your Business
@@ -1186,7 +1186,7 @@ onChange={(e) => setLandlordState(e.target.value)}
       ) : (
         <>
           <div className="flex items-center gap-2">
-            <div className="text-lg font-semibold" style={selectedLandlord.verified ? { color: "#EAB308" } : {}}>{selectedLandlord.name}</div>
+            <div className="text-lg font-semibold" style={selectedLandlord.verified ? { color: "#c9a227" } : {}}>{selectedLandlord.name}</div>
             {selectedLandlord.verified && (
               <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#fef9c3", color: "#854d0e" }}>
                 ✓ Verified Business
@@ -1228,7 +1228,7 @@ onChange={(e) => setLandlordState(e.target.value)}
             </div>
           ) : (
             <button
-              className="mt-3 rounded-xl bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700"
+              className="mt-3 rounded-xl px-4 py-2 text-sm text-zinc-800" style={{ backgroundColor: "#F5D87A" }}
               onClick={() => { setVerifyModalLandlordId(selectedLandlord.id); setVBizName(selectedLandlord.name); }}
             >
               Claim &amp; Verify Your Business
