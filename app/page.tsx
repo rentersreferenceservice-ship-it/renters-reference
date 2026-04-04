@@ -17,6 +17,8 @@ type Landlord = {
   verified: boolean;
   contactInfo: string;
   website: string;
+  address: string;
+  businessEmail: string;
 };
 
 type Report = {
@@ -184,6 +186,8 @@ useEffect(() => {
             verified: l.verified ?? false,
             contactInfo: l.contact_info ?? "",
             website: l.website ?? "",
+            address: l.address ?? "",
+            businessEmail: l.business_email ?? "",
           })) as any
         );
       }
@@ -328,6 +332,8 @@ const filteredLandlords = useMemo(() => {
   verified: false,
   contactInfo: "",
   website: "",
+  address: "",
+  businessEmail: "",
 };
 
   setLandlords((prev) => [newLandlord, ...prev]);
@@ -457,23 +463,37 @@ function verifyReport(reportId: string) {
   setReports((prev) => prev.filter((r) => r.id !== reportId));
 }
 
-function submitVerification(landlordId: string) {
+async function submitVerification(landlordId: string) {
   if (!vBizName.trim() || !vAddress.trim() || !vPhone.trim() || !vEmail.trim()) {
     alert("Please fill in all required fields.");
     return;
   }
-  const landlord = landlords.find(l => l.id === landlordId);
-  const subject = encodeURIComponent(`Verification Application - ${vBizName}`);
-  const body = encodeURIComponent(
-    `Business Name: ${vBizName}\nAddress: ${vAddress}\nPhone: ${vPhone}\nEmail: ${vEmail}\nWebsite: ${vWebsite}\nLandlord ID: ${landlordId}\nProfile: ${landlord?.name} (${landlord?.city}, ${landlord?.state})`
-  );
-  window.location.href = `mailto:rentersreferenceservice@gmail.com?subject=${subject}&body=${body}`;
-  const next = new Set(pendingVerification);
-  next.add(landlordId);
-  setPendingVerification(next);
-  localStorage.setItem("rr_pending_verify", JSON.stringify([...next]));
-  setVerifyModalLandlordId(null);
-  setVBizName(""); setVAddress(""); setVPhone(""); setVEmail(""); setVWebsite("");
+  try {
+    const res = await fetch("/api/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        landlordId,
+        bizName: vBizName,
+        address: vAddress,
+        phone: vPhone,
+        email: vEmail,
+        website: vWebsite,
+      }),
+    });
+    const data = await res.json();
+    if (data.error) { alert(`Error: ${data.error}`); return; }
+    const next = new Set(pendingVerification);
+    next.add(landlordId);
+    setPendingVerification(next);
+    localStorage.setItem("rr_pending_verify", JSON.stringify([...next]));
+    setVerifyModalLandlordId(null);
+    setVBizName(""); setVAddress(""); setVPhone(""); setVEmail(""); setVWebsite("");
+    window.location.href = data.url;
+  } catch (err) {
+    alert("Could not start checkout. Please try again.");
+    console.error(err);
+  }
 }
 
   return (
@@ -1151,15 +1171,23 @@ onChange={(e) => setLandlordState(e.target.value)}
 
           {selectedLandlord.verified ? (
             <div className="mt-3 space-y-1">
+              {selectedLandlord.address && (
+                <div className="text-sm text-zinc-700">📍 {selectedLandlord.address}</div>
+              )}
               {selectedLandlord.contactInfo && (
                 <div className="text-sm text-zinc-700">📞 {selectedLandlord.contactInfo}</div>
+              )}
+              {selectedLandlord.businessEmail && (
+                <a href={`mailto:${selectedLandlord.businessEmail}`} className="text-sm text-zinc-700 underline block">
+                  ✉️ {selectedLandlord.businessEmail}
+                </a>
               )}
               {selectedLandlord.website && (
                 <a
                   href={selectedLandlord.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-blue-600 underline"
+                  className="text-sm text-blue-600 underline block"
                 >
                   🌐 {selectedLandlord.website}
                 </a>
