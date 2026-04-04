@@ -93,6 +93,8 @@ export default function Home() {
   const [filterState, setFilterState] = useState("");
   const [filterCity, setFilterCity] = useState("");
   const [filterLandlord, setFilterLandlord] = useState("");
+  const [claimModalOpen, setClaimModalOpen] = useState(false);
+  const [claimSearch, setClaimSearch] = useState("");
   
   const [reports, setReports] = useState<Report[]>([]);
 
@@ -459,14 +461,86 @@ function verifyReport(reportId: string) {
             
           </div>
 
-          <a
-            href="/login"
-            className="rounded-xl border px-4 py-2 text-sm"
-            title="Login (we'll connect this to roles next)"
-          >
-            Login
-          </a>
+          <div className="flex flex-col items-end gap-2">
+            <a
+              href="/login"
+              className="rounded-xl border px-4 py-2 text-sm"
+              title="Login (we'll connect this to roles next)"
+            >
+              Login
+            </a>
+            <button
+              className="rounded-xl bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700"
+              onClick={() => { setClaimModalOpen(true); setClaimSearch(""); }}
+            >
+              Landlords: Claim Your Profile
+            </button>
+          </div>
         </div>
+
+        {/* CLAIM MODAL */}
+        {claimModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl mx-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Claim Your Profile</h2>
+                <button className="text-zinc-400 hover:text-zinc-700 text-xl leading-none" onClick={() => setClaimModalOpen(false)}>✕</button>
+              </div>
+
+              <input
+                className="w-full rounded-xl border px-4 py-3 text-sm"
+                placeholder="Search your business name..."
+                value={claimSearch}
+                onChange={(e) => setClaimSearch(e.target.value)}
+                autoFocus
+              />
+
+              <div className="mt-4 space-y-2 max-h-64 overflow-y-auto">
+                {claimSearch.trim() === "" ? (
+                  <p className="text-sm text-zinc-400">Start typing to find your profile.</p>
+                ) : (() => {
+                  const results = landlords.filter(l =>
+                    l.name.toLowerCase().includes(claimSearch.trim().toLowerCase())
+                  );
+                  if (results.length === 0) return (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-zinc-500 mb-3">No profiles found for "{claimSearch}".</p>
+                      <button
+                        className="rounded-xl bg-black px-4 py-2 text-sm text-white"
+                        onClick={() => {
+                          setClaimModalOpen(false);
+                          resetForms();
+                          setView("addLandlord");
+                        }}
+                      >
+                        Add Your Landlord Profile
+                      </button>
+                    </div>
+                  );
+                  return results.map(l => (
+                    <div key={l.id} className="flex items-center justify-between rounded-xl border px-4 py-3">
+                      <div>
+                        <div className="text-sm font-medium">{l.name}</div>
+                        <div className="text-xs text-zinc-500">{l.city}, {l.state}</div>
+                      </div>
+                      {l.verified ? (
+                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">✓ Verified</span>
+                      ) : (
+                        <a
+                          href={`mailto:rentersreferenceservice@gmail.com?subject=Claim My Business Listing - ${encodeURIComponent(l.name)}&body=I'd like to claim and verify my profile for ${encodeURIComponent(l.name)} located in ${encodeURIComponent(l.city)}, ${encodeURIComponent(l.state)}.`}
+                          className="rounded-xl bg-green-600 px-3 py-1.5 text-xs text-white hover:bg-green-700"
+                          onClick={() => setClaimModalOpen(false)}
+                        >
+                          Claim
+                        </a>
+                      )}
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
+          </div>
+        )}
 
         
 
