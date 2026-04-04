@@ -520,7 +520,7 @@ async function submitVerification(landlordId: string) {
               Login
             </a>
             <button
-              className="rounded-xl px-4 py-2 text-sm text-white" style={{ backgroundColor: "#B2C9A7" }}
+              className="rounded-xl px-4 py-2 text-sm text-white" style={{ backgroundColor: "#EAB308" }}
               onClick={() => { setClaimModalOpen(true); setClaimSearch(""); }}
             >
               Landlords: Claim Your Profile
@@ -574,12 +574,12 @@ async function submitVerification(landlordId: string) {
                         <div className="text-xs text-zinc-500">{l.city}, {l.state}</div>
                       </div>
                       {l.verified ? (
-                        <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#e8f0e5", color: "#5a7a54" }}>✓ Verified</span>
+                        <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#fef9c3", color: "#854d0e" }}>✓ Verified</span>
                       ) : pendingVerification.has(l.id) ? (
                         <span className="rounded-xl bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-700">Verification In Process</span>
                       ) : (
                         <button
-                          className="rounded-xl px-3 py-1.5 text-xs text-white" style={{ backgroundColor: "#B2C9A7" }}
+                          className="rounded-xl px-3 py-1.5 text-xs text-white" style={{ backgroundColor: "#EAB308" }}
                           onClick={() => { setClaimModalOpen(false); setVerifyModalLandlordId(l.id); setVBizName(l.name); }}
                         >
                           Claim
@@ -632,7 +632,7 @@ async function submitVerification(landlordId: string) {
                   <div className="mt-5 flex gap-3">
                     <button
                       className="flex-1 rounded-xl px-4 py-2 text-sm text-white"
-                      style={{ backgroundColor: "#B2C9A7" }}
+                      style={{ backgroundColor: "#EAB308" }}
                       onClick={() => {
                         if (!vBizName.trim() || !vAddress.trim() || !vPhone.trim() || !vEmail.trim()) {
                           alert("Please fill in all required fields.");
@@ -666,7 +666,7 @@ async function submitVerification(landlordId: string) {
                     <button className="rounded-xl border px-4 py-2 text-sm" onClick={() => setVerifyStep(1)}>← Back</button>
                     <button
                       className="flex-1 rounded-xl px-4 py-2 text-sm text-white"
-                      style={{ backgroundColor: "#B2C9A7" }}
+                      style={{ backgroundColor: "#EAB308" }}
                       onClick={() => submitVerification(verifyModalLandlordId)}
                     >
                       Pay $29.99 &amp; Verify
@@ -878,7 +878,7 @@ return (
                         </button>
 
                         {l.verified ? (
-                          <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#e8f0e5", color: "#5a7a54" }}>
+                          <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#fef9c3", color: "#854d0e" }}>
                             ✓ Verified Business
                           </span>
                         ) : pendingVerification.has(l.id) ? (
@@ -887,7 +887,7 @@ return (
                           </span>
                         ) : (
                           <button
-                            className="rounded-xl px-3 py-1 text-xs text-white" style={{ backgroundColor: "#B2C9A7" }}
+                            className="rounded-xl px-3 py-1 text-xs text-white" style={{ backgroundColor: "#EAB308" }}
                             onClick={(e) => { e.stopPropagation(); setVerifyModalLandlordId(l.id); setVBizName(l.name); }}
                           >
                             Claim &amp; Verify Your Business
@@ -1186,9 +1186,9 @@ onChange={(e) => setLandlordState(e.target.value)}
       ) : (
         <>
           <div className="flex items-center gap-2">
-            <div className="text-lg font-semibold" style={selectedLandlord.verified ? { color: "#B2C9A7" } : {}}>{selectedLandlord.name}</div>
+            <div className="text-lg font-semibold" style={selectedLandlord.verified ? { color: "#EAB308" } : {}}>{selectedLandlord.name}</div>
             {selectedLandlord.verified && (
-              <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#e8f0e5", color: "#5a7a54" }}>
+              <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#fef9c3", color: "#854d0e" }}>
                 ✓ Verified Business
               </span>
             )}
