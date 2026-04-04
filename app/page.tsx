@@ -1169,7 +1169,7 @@ onChange={(e) => setLandlordState(e.target.value)}
                 <div className="rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-4 text-center text-sm text-zinc-500">
                   <div className="font-medium text-zinc-600">Your Ad Here</div>
                   <div className="mt-1 text-xs">Reach Renters in {Object.entries(STATE_NAME_TO_CODE).find(([, code]) => code === filterState)?.[0].replace(/\b\w/g, c => c.toUpperCase()) ?? filterState}</div>
-                  <a href="mailto:rentersreferenceservice@gmail.com" className="mt-2 block text-xs underline text-zinc-400">
+                  <a href="mailto:rentersreferenceservice@gmail.com" className="mt-2 block text-xs underline text-zinc-400 break-all">
                     rentersreferenceservice@gmail.com
                   </a>
                 </div>
@@ -1177,7 +1177,7 @@ onChange={(e) => setLandlordState(e.target.value)}
                 <div className="rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-4 text-center text-sm text-zinc-500">
                   <div className="font-medium text-zinc-600">Your Ad Here</div>
                   <div className="mt-1 text-xs">Reach Renters in {Object.entries(STATE_NAME_TO_CODE).find(([, code]) => code === filterState)?.[0].replace(/\b\w/g, c => c.toUpperCase()) ?? filterState}</div>
-                  <a href="mailto:rentersreferenceservice@gmail.com" className="mt-2 block text-xs underline text-zinc-400">
+                  <a href="mailto:rentersreferenceservice@gmail.com" className="mt-2 block text-xs underline text-zinc-400 break-all">
                     rentersreferenceservice@gmail.com
                   </a>
                 </div>
@@ -1185,7 +1185,7 @@ onChange={(e) => setLandlordState(e.target.value)}
                 <div className="rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-4 text-center text-sm text-zinc-500">
                   <div className="font-medium text-zinc-600">Your Ad Here</div>
                   <div className="mt-1 text-xs">Reach Renters in {Object.entries(STATE_NAME_TO_CODE).find(([, code]) => code === filterState)?.[0].replace(/\b\w/g, c => c.toUpperCase()) ?? filterState}</div>
-                  <a href="mailto:rentersreferenceservice@gmail.com" className="mt-2 block text-xs underline text-zinc-400">
+                  <a href="mailto:rentersreferenceservice@gmail.com" className="mt-2 block text-xs underline text-zinc-400 break-all">
                     rentersreferenceservice@gmail.com
                   </a>
                 </div>
