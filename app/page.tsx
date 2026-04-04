@@ -658,7 +658,7 @@ async function submitVerification(landlordId: string) {
 
                   <div className="mt-4 rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-4">
                     <div className="text-sm font-medium text-zinc-700 mb-1">Verification Fee</div>
-                    <div className="text-xs text-zinc-500 mb-2">Your verified badge and contact info will appear on your profile immediately after payment.</div>
+                    <div className="text-xs text-zinc-500 mb-2">An annual fee is required to verify your business listing. Your verified badge and contact info will appear on your profile immediately after payment.</div>
                     <div className="text-lg font-bold text-zinc-800">$29.99 <span className="text-xs font-normal text-zinc-500">/ year</span></div>
                   </div>
 
