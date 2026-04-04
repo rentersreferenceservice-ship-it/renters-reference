@@ -14,6 +14,9 @@ type Landlord = {
   city: string;
  landlordType: "PRIVATE" | "MANAGEMENT" | "AIRBNB" | "OTHER";
   createdAt: string;
+  verified: boolean;
+  contactInfo: string;
+  website: string;
 };
 
 type Report = {
@@ -167,6 +170,9 @@ useEffect(() => {
             city: l.city,
             landlordType: "PRIVATE",
             createdAt: l.created_at ?? new Date().toISOString(),
+            verified: l.verified ?? false,
+            contactInfo: l.contact_info ?? "",
+            website: l.website ?? "",
           })) as any
         );
       }
@@ -308,6 +314,9 @@ const filteredLandlords = useMemo(() => {
   city: row.city,
   landlordType: "PRIVATE",
   createdAt: row.created_at ?? new Date().toISOString(),
+  verified: false,
+  contactInfo: "",
+  website: "",
 };
 
   setLandlords((prev) => [newLandlord, ...prev]);
@@ -951,13 +960,43 @@ onChange={(e) => setLandlordState(e.target.value)}
         </p>
       ) : (
         <>
-          <div className="text-lg font-semibold">
-            {selectedLandlord.name}
+          <div className="flex items-center gap-2">
+            <div className="text-lg font-semibold">{selectedLandlord.name}</div>
+            {selectedLandlord.verified && (
+              <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                ✓ Verified Business
+              </span>
+            )}
           </div>
 
           <div className="text-sm text-zinc-600">
             {selectedLandlord.city}, {selectedLandlord.state}
           </div>
+
+          {selectedLandlord.verified ? (
+            <div className="mt-3 space-y-1">
+              {selectedLandlord.contactInfo && (
+                <div className="text-sm text-zinc-700">📞 {selectedLandlord.contactInfo}</div>
+              )}
+              {selectedLandlord.website && (
+                <a
+                  href={selectedLandlord.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-600 underline"
+                >
+                  🌐 {selectedLandlord.website}
+                </a>
+              )}
+            </div>
+          ) : (
+            <a
+              href="mailto:rentersreferenceservice@gmail.com?subject=Claim My Business Listing"
+              className="mt-3 inline-block rounded-xl border border-zinc-300 px-3 py-1.5 text-xs text-zinc-500 hover:border-zinc-500"
+            >
+              Claim &amp; Verify Your Business
+            </a>
+          )}
         </>
       )}
     </div>
