@@ -1,23 +1,25 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
+
       {/* NAV */}
-      <nav className="flex items-center justify-between px-6 py-4 bg-white border-b">
-        <div className="text-xl font-semibold tracking-tight">Renters Reference</div>
+      <nav className="relative z-10 flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur border-b">
+        <Image src="/logo.png" alt="Renters Reference" width={180} height={60} className="object-contain" />
         <div className="flex gap-3">
-          <a href="/login" className="rounded-xl border px-4 py-2 text-sm">Log In</a>
+          <a href="/login" className="rounded-xl border bg-white px-4 py-2 text-sm">Log In</a>
           <a href="/login" className="rounded-xl px-4 py-2 text-sm text-zinc-800" style={{ backgroundColor: "#F5D87A" }}>Create Account</a>
         </div>
       </nav>
 
       {/* HERO */}
-      <section className="flex flex-col items-center justify-center text-center px-6 py-16 bg-white">
+      <section className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-16 bg-white/70 backdrop-blur">
         <h1 className="text-4xl font-bold tracking-tight text-zinc-900 max-w-2xl leading-tight">
           The Honest Landlord Review Platform
         </h1>
@@ -34,17 +36,17 @@ export default function LandingPage() {
       </section>
 
       {/* TWO COLUMNS */}
-      <section className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-0">
+      <section className="relative z-10 flex-1 grid grid-cols-1 md:grid-cols-2 gap-0">
 
         {/* FOR TENANTS */}
-        <div className="flex flex-col justify-center px-10 py-14 bg-zinc-50 border-t md:border-r">
+        <div className="flex flex-col justify-center px-10 py-14 bg-white/75 backdrop-blur border-t md:border-r">
           <div className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">For Tenants</div>
           <h2 className="text-2xl font-semibold text-zinc-900 mb-4">Know before you sign.</h2>
           <ul className="space-y-3 text-zinc-600 text-sm">
             <li>🔍 <span className="font-medium">Search by state</span> — find landlords in your area instantly</li>
             <li>⭐ <span className="font-medium">Read honest reviews</span> — repair responsiveness, deposit returns, and overall experience from past tenants</li>
             <li>📋 <span className="font-medium">Make informed decisions</span> — before you sign a lease, know who you're renting from</li>
-            <li>🔒 <span className="font-medium">Anonymous & safe</span> — all reports are anonymous so you can be honest without worry</li>
+            <li>🔒 <span className="font-medium">Anonymous & safe</span> — all reports are completely anonymous so you can be honest without worry</li>
             <li>✅ <span className="font-medium">Free for tenants</span> — no fees, no sign-up required to search or submit a report</li>
           </ul>
           <button
@@ -57,7 +59,7 @@ export default function LandingPage() {
         </div>
 
         {/* FOR LANDLORDS */}
-        <div className="flex flex-col justify-center px-10 py-14 bg-white border-t">
+        <div className="flex flex-col justify-center px-10 py-14 bg-white/60 backdrop-blur border-t">
           <div className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">For Landlords</div>
           <h2 className="text-2xl font-semibold text-zinc-900 mb-4">Show tenants why you're the best.</h2>
           <ul className="space-y-3 text-zinc-600 text-sm">
@@ -78,7 +80,7 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="text-center py-6 text-xs text-zinc-400 border-t bg-white">
+      <footer className="relative z-10 text-center py-6 text-xs text-zinc-400 border-t bg-white/80 backdrop-blur">
         © {new Date().getFullYear()} Renters Reference ·{" "}
         <a href="mailto:rentersreferenceservice@gmail.com" className="underline">Contact Us</a>
       </footer>

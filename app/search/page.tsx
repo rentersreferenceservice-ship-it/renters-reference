@@ -91,6 +91,7 @@ export default function Home() {
   // data
   
   const [landlords, setLandlords] = useState<Landlord[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [filterState, setFilterState] = useState("");
   const [filterCity, setFilterCity] = useState("");
@@ -224,6 +225,8 @@ useEffect(() => {
       }
     } catch (err) {
       console.error("LOAD DATA ERROR:", err);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -481,6 +484,15 @@ function submitVerification(landlordId: string) {
   url.searchParams.set("client_reference_id", landlordId);
   window.location.href = url.toString();
 }
+
+  if (loading) return (
+    <div className="min-h-screen bg-transparent flex items-center justify-center">
+      <div className="text-center">
+        <img src="/logo.png" alt="Renters Reference" className="mx-auto mb-6 w-48 object-contain" />
+        <div className="text-zinc-400 text-sm">Loading landlord data...</div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center">
