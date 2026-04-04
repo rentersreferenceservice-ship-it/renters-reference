@@ -569,6 +569,16 @@ function verifyReport(reportId: string) {
   />
 </div>
 
+{filterState && (
+  <div className="mt-4 rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 px-4 py-3 text-center text-sm text-zinc-500">
+    <div className="font-medium text-zinc-600">Your Ad Here</div>
+    <div>Reach Renters in {Object.entries(STATE_NAME_TO_CODE).find(([, code]) => code === filterState)?.[0].replace(/\b\w/g, c => c.toUpperCase()) ?? filterState}</div>
+    <a href="mailto:rentersreferenceservice@gmail.com" className="mt-1 block text-xs underline text-zinc-400">
+      rentersreferenceservice@gmail.com
+    </a>
+  </div>
+)}
+
 {landlords.length === 0 ? (
               <p className="mt-2 text-zinc-600">No landlords yet.</p>
         ) : filteredLandlords.length === 0 ? (
