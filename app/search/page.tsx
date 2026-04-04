@@ -486,14 +486,14 @@ function submitVerification(landlordId: string) {
 }
 
   if (loading) return (
-    <div className="min-h-screen bg-transparent flex items-center justify-center p-10">
-      <div className="bg-white rounded-3xl shadow-lg px-20 py-16 flex flex-col items-center justify-center">
-        <svg width="56" height="56" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" className="mb-4">
+    <div className="min-h-screen bg-transparent flex items-center justify-center" style={{ padding: "60px" }}>
+      <div className="bg-white rounded-3xl shadow-2xl flex flex-col items-center justify-center" style={{ width: "360px", height: "320px" }}>
+        <svg width="72" height="72" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M22 4L4 18V40H16V28H28V40H40V18L22 4Z" stroke="#18181b" strokeWidth="2.5" strokeLinejoin="round" fill="white"/>
           <rect x="13" y="18" width="18" height="18" rx="1" stroke="#18181b" strokeWidth="2" fill="white"/>
           <text x="22" y="32" textAnchor="middle" fontFamily="serif" fontWeight="bold" fontSize="13" fill="#18181b">R</text>
         </svg>
-        <div className="text-2xl font-bold tracking-tight text-zinc-900">Renters Reference</div>
+        <div className="mt-5 text-2xl font-bold tracking-tight text-zinc-900">Renters Reference</div>
         <div className="mt-3 text-sm text-zinc-400">Loading...</div>
       </div>
     </div>
