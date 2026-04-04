@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-
 export async function POST(req: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
 
@@ -49,8 +49,6 @@ export async function POST(req: NextRequest) {
       console.error("Supabase update error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
-
-    console.log(`Landlord ${meta.landlord_id} verified via Stripe.`);
   }
 
   return NextResponse.json({ received: true });
