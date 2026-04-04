@@ -9,7 +9,7 @@ export default function LandingPage() {
     <div className="min-h-screen flex flex-col relative">
 
       {/* NAV */}
-      <nav className="relative z-10 flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur border-b">
+      <nav className="relative z-10 flex items-center justify-between px-6 py-4 bg-white/90 backdrop-blur border-b">
         <div className="flex items-center gap-3">
           <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22 4L4 18V40H16V28H28V40H40V18L22 4Z" stroke="#18181b" strokeWidth="2.5" strokeLinejoin="round" fill="white"/>
@@ -20,43 +20,73 @@ export default function LandingPage() {
         </div>
         <div className="flex gap-3">
           <a href="/login" className="rounded-xl border bg-white px-4 py-2 text-sm">Log In</a>
-          <a href="/login" className="rounded-xl px-4 py-2 text-sm text-zinc-800" style={{ backgroundColor: "#F5D87A" }}>Create Account</a>
+          <a href="/login" className="rounded-xl px-4 py-2 text-sm font-medium text-zinc-800" style={{ backgroundColor: "#F5D87A" }}>Create Account</a>
         </div>
       </nav>
 
       {/* HERO */}
-      <section className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-16 bg-white/70 backdrop-blur">
-        <h1 className="text-4xl font-bold tracking-tight text-zinc-900 max-w-2xl leading-tight">
-          The Honest Landlord Review Platform
+      <section className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-20 bg-white/80 backdrop-blur border-b">
+        <div className="flex gap-1 mb-6">
+          {[1,2,3,4,5].map(i => (
+            <span key={i} className="text-3xl" style={{ color: "#F5D87A" }}>★</span>
+          ))}
+        </div>
+        <h1 className="text-5xl font-bold tracking-tight text-zinc-900 max-w-2xl leading-tight">
+          Know Your Landlord<br/>Before You Sign.
         </h1>
-        <p className="mt-4 text-lg text-zinc-500 max-w-xl">
-          Real reviews from real tenants. Search landlords before you sign. Verified profiles for landlords who want to stand out.
+        <p className="mt-5 text-lg text-zinc-500 max-w-lg">
+          Real reviews from real tenants — repair speed, deposit returns, and overall experience. Free, anonymous, and honest.
         </p>
-        <button
-          className="mt-8 rounded-xl px-8 py-3 text-base font-medium text-zinc-800"
-          style={{ backgroundColor: "#F5D87A" }}
-          onClick={() => router.push("/search")}
-        >
-          Search Landlords
-        </button>
+        <div className="mt-8 flex gap-3 flex-wrap justify-center">
+          <button
+            className="rounded-xl px-8 py-3 text-base font-medium text-zinc-800 shadow-md"
+            style={{ backgroundColor: "#F5D87A" }}
+            onClick={() => router.push("/search")}
+          >
+            Search Landlords
+          </button>
+          <button
+            className="rounded-xl px-8 py-3 text-base font-medium text-zinc-800 bg-white border shadow-md"
+            onClick={() => router.push("/search")}
+          >
+            Claim Your Profile
+          </button>
+        </div>
+
+        {/* STAT PILLS */}
+        <div className="mt-10 flex gap-4 flex-wrap justify-center">
+          <div className="rounded-full bg-white border px-5 py-2 text-sm text-zinc-600 shadow-sm">🏠 1,000+ Landlords Listed</div>
+          <div className="rounded-full bg-white border px-5 py-2 text-sm text-zinc-600 shadow-sm">🔒 100% Anonymous Reports</div>
+          <div className="rounded-full bg-white border px-5 py-2 text-sm text-zinc-600 shadow-sm">✅ Free for Tenants</div>
+        </div>
       </section>
 
       {/* TWO COLUMNS */}
-      <section className="relative z-10 flex-1 grid grid-cols-1 md:grid-cols-2 gap-0">
+      <section className="relative z-10 flex-1 grid grid-cols-1 md:grid-cols-2">
 
         {/* FOR TENANTS */}
-        <div className="flex flex-col justify-center px-10 py-14 bg-white/75 backdrop-blur border-t md:border-r">
-          <div className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">For Tenants</div>
-          <h2 className="text-2xl font-semibold text-zinc-900 mb-4">Know before you sign.</h2>
-          <ul className="space-y-3 text-zinc-600 text-sm">
-            <li>🔍 <span className="font-medium">Search by state</span> — find landlords in your area instantly</li>
-            <li>⭐ <span className="font-medium">Read honest reviews</span> — repair responsiveness, deposit returns, and overall experience from past tenants</li>
-            <li>📋 <span className="font-medium">Make informed decisions</span> — before you sign a lease, know who you're renting from</li>
-            <li>🔒 <span className="font-medium">Anonymous & safe</span> — all reports are completely anonymous so you can be honest without worry</li>
-            <li>✅ <span className="font-medium">Free for tenants</span> — no fees, no sign-up required to search or submit a report</li>
-          </ul>
+        <div className="flex flex-col justify-center px-10 py-14 bg-white/75 backdrop-blur md:border-r border-t">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-sm" style={{ backgroundColor: "#fef9c3" }}>🔍</div>
+          <div className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-2">For Tenants</div>
+          <h2 className="text-2xl font-bold text-zinc-900 mb-5">Know before you sign.</h2>
+          <div className="space-y-4">
+            {[
+              { icon: "⭐", title: "Honest Reviews", desc: "Read about repair responsiveness, deposit returns, and overall experience from past tenants" },
+              { icon: "🔍", title: "Search by State", desc: "Find landlords in your area instantly and filter by city or name" },
+              { icon: "🔒", title: "Anonymous & Safe", desc: "All reports are completely anonymous — be honest without worry" },
+              { icon: "✅", title: "Free for Tenants", desc: "No fees, no sign-up required to search or submit a report" },
+            ].map(({ icon, title, desc }) => (
+              <div key={title} className="flex gap-3 items-start">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{ backgroundColor: "#fef9c3" }}>{icon}</div>
+                <div>
+                  <div className="text-sm font-semibold text-zinc-800">{title}</div>
+                  <div className="text-xs text-zinc-500 mt-0.5">{desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
           <button
-            className="mt-8 self-start rounded-xl px-6 py-2.5 text-sm font-medium text-zinc-800"
+            className="mt-8 self-start rounded-xl px-6 py-2.5 text-sm font-medium text-zinc-800 shadow-sm"
             style={{ backgroundColor: "#F5D87A" }}
             onClick={() => router.push("/search")}
           >
@@ -65,17 +95,28 @@ export default function LandingPage() {
         </div>
 
         {/* FOR LANDLORDS */}
-        <div className="flex flex-col justify-center px-10 py-14 bg-white/60 backdrop-blur border-t">
-          <div className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">For Landlords</div>
-          <h2 className="text-2xl font-semibold text-zinc-900 mb-4">Show tenants why you're the best.</h2>
-          <ul className="space-y-3 text-zinc-600 text-sm">
-            <li>🏅 <span className="font-medium">Claim your verified profile</span> — stand out with a trusted badge that tenants recognize</li>
-            <li>⭐ <span className="font-medium">Showcase your ratings</span> — let your 5-star reputation attract quality tenants</li>
-            <li>📞 <span className="font-medium">Display your contact info</span> — phone, email, and website visible directly on your profile</li>
-            <li>🌐 <span className="font-medium">Link your website</span> — drive traffic from renters actively looking in your area</li>
-          </ul>
+        <div className="flex flex-col justify-center px-10 py-14 bg-zinc-900 backdrop-blur border-t">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-sm" style={{ backgroundColor: "#F5D87A" }}>🏅</div>
+          <div className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-2">For Landlords</div>
+          <h2 className="text-2xl font-bold text-white mb-5">Show tenants why you're the best.</h2>
+          <div className="space-y-4">
+            {[
+              { icon: "✓", title: "Verified Badge", desc: "Stand out with a trusted verified badge that quality tenants look for" },
+              { icon: "⭐", title: "Showcase Ratings", desc: "Let your 5-star reputation attract the tenants you want" },
+              { icon: "📞", title: "Display Contact Info", desc: "Phone, email, and website visible directly on your profile" },
+              { icon: "🌐", title: "Link Your Website", desc: "Drive traffic from renters actively searching in your area" },
+            ].map(({ icon, title, desc }) => (
+              <div key={title} className="flex gap-3 items-start">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0 font-bold" style={{ backgroundColor: "#F5D87A", color: "#18181b" }}>{icon}</div>
+                <div>
+                  <div className="text-sm font-semibold text-white">{title}</div>
+                  <div className="text-xs text-zinc-400 mt-0.5">{desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
           <button
-            className="mt-8 self-start rounded-xl px-6 py-2.5 text-sm font-medium text-zinc-800"
+            className="mt-8 self-start rounded-xl px-6 py-2.5 text-sm font-medium text-zinc-800 shadow-sm"
             style={{ backgroundColor: "#F5D87A" }}
             onClick={() => router.push("/search")}
           >
@@ -86,7 +127,7 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="relative z-10 text-center py-6 text-xs text-zinc-400 border-t bg-white/80 backdrop-blur">
+      <footer className="relative z-10 text-center py-6 text-xs text-zinc-400 border-t bg-white/90 backdrop-blur">
         © {new Date().getFullYear()} Renters Reference ·{" "}
         <a href="mailto:rentersreferenceservice@gmail.com" className="underline">Contact Us</a>
       </footer>
