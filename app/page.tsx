@@ -95,6 +95,15 @@ export default function Home() {
   const [filterLandlord, setFilterLandlord] = useState("");
   const [claimModalOpen, setClaimModalOpen] = useState(false);
   const [claimSearch, setClaimSearch] = useState("");
+  const [verifyModalLandlordId, setVerifyModalLandlordId] = useState<string | null>(null);
+  const [pendingVerification, setPendingVerification] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("rr_pending_verify") ?? "[]")); } catch { return new Set(); }
+  });
+  const [vBizName, setVBizName] = useState("");
+  const [vAddress, setVAddress] = useState("");
+  const [vPhone, setVPhone] = useState("");
+  const [vEmail, setVEmail] = useState("");
+  const [vWebsite, setVWebsite] = useState("");
   
   const [reports, setReports] = useState<Report[]>([]);
 
@@ -448,6 +457,25 @@ function verifyReport(reportId: string) {
   setReports((prev) => prev.filter((r) => r.id !== reportId));
 }
 
+function submitVerification(landlordId: string) {
+  if (!vBizName.trim() || !vAddress.trim() || !vPhone.trim() || !vEmail.trim()) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+  const landlord = landlords.find(l => l.id === landlordId);
+  const subject = encodeURIComponent(`Verification Application - ${vBizName}`);
+  const body = encodeURIComponent(
+    `Business Name: ${vBizName}\nAddress: ${vAddress}\nPhone: ${vPhone}\nEmail: ${vEmail}\nWebsite: ${vWebsite}\nLandlord ID: ${landlordId}\nProfile: ${landlord?.name} (${landlord?.city}, ${landlord?.state})`
+  );
+  window.location.href = `mailto:rentersreferenceservice@gmail.com?subject=${subject}&body=${body}`;
+  const next = new Set(pendingVerification);
+  next.add(landlordId);
+  setPendingVerification(next);
+  localStorage.setItem("rr_pending_verify", JSON.stringify([...next]));
+  setVerifyModalLandlordId(null);
+  setVBizName(""); setVAddress(""); setVPhone(""); setVEmail(""); setVWebsite("");
+}
+
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center">
       <div className="mx-auto max-w-4xl rounded-2xl bg-white p-6 shadow-sm">
@@ -525,14 +553,15 @@ function verifyReport(reportId: string) {
                       </div>
                       {l.verified ? (
                         <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">✓ Verified</span>
+                      ) : pendingVerification.has(l.id) ? (
+                        <span className="rounded-xl bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-700">Verification In Process</span>
                       ) : (
-                        <a
-                          href={`mailto:rentersreferenceservice@gmail.com?subject=Claim My Business Listing - ${encodeURIComponent(l.name)}&body=I'd like to claim and verify my profile for ${encodeURIComponent(l.name)} located in ${encodeURIComponent(l.city)}, ${encodeURIComponent(l.state)}.`}
+                        <button
                           className="rounded-xl bg-green-600 px-3 py-1.5 text-xs text-white hover:bg-green-700"
-                          onClick={() => setClaimModalOpen(false)}
+                          onClick={() => { setClaimModalOpen(false); setVerifyModalLandlordId(l.id); setVBizName(l.name); }}
                         >
                           Claim
-                        </a>
+                        </button>
                       )}
                     </div>
                   ));
@@ -543,6 +572,62 @@ function verifyReport(reportId: string) {
         )}
 
         
+
+        {/* VERIFICATION MODAL */}
+        {verifyModalLandlordId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Verify Your Business</h2>
+                <button className="text-zinc-400 hover:text-zinc-700 text-xl leading-none" onClick={() => setVerifyModalLandlordId(null)}>✕</button>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Business Name *</label>
+                  <input className="w-full rounded-xl border px-4 py-2 text-sm" value={vBizName} onChange={e => setVBizName(e.target.value)} placeholder="Your business name" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Business Address *</label>
+                  <input className="w-full rounded-xl border px-4 py-2 text-sm" value={vAddress} onChange={e => setVAddress(e.target.value)} placeholder="123 Main St, City, State" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Phone Number *</label>
+                  <input className="w-full rounded-xl border px-4 py-2 text-sm" type="tel" value={vPhone} onChange={e => setVPhone(e.target.value)} placeholder="(555) 555-5555" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Email Address *</label>
+                  <input className="w-full rounded-xl border px-4 py-2 text-sm" type="email" value={vEmail} onChange={e => setVEmail(e.target.value)} placeholder="you@example.com" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Website URL</label>
+                  <input className="w-full rounded-xl border px-4 py-2 text-sm" type="url" value={vWebsite} onChange={e => setVWebsite(e.target.value)} placeholder="https://yourwebsite.com" />
+                </div>
+              </div>
+
+              <div className="mt-5 rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-4">
+                <div className="text-sm font-medium text-zinc-700 mb-1">Verification Fee</div>
+                <div className="text-xs text-zinc-500 mb-3">A one-time fee is required to verify your business listing. After submitting this form, we will contact you with payment instructions.</div>
+                <div className="text-lg font-bold text-zinc-800">$29.99 <span className="text-xs font-normal text-zinc-500">one-time</span></div>
+              </div>
+
+              <div className="mt-5 flex gap-3">
+                <button
+                  className="flex-1 rounded-xl bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700"
+                  onClick={() => submitVerification(verifyModalLandlordId)}
+                >
+                  Submit Verification Application
+                </button>
+                <button
+                  className="rounded-xl border px-4 py-2 text-sm"
+                  onClick={() => setVerifyModalLandlordId(null)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* MAIN */}
         <div className="mb-4 flex gap-2 md:hidden">
@@ -747,14 +832,17 @@ return (
                           <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
                             ✓ Verified Business
                           </span>
+                        ) : pendingVerification.has(l.id) ? (
+                          <span className="rounded-xl bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-700">
+                            Verification In Process
+                          </span>
                         ) : (
-                          <a
-                            href={`mailto:rentersreferenceservice@gmail.com?subject=Claim My Business Listing - ${encodeURIComponent(l.name)}`}
+                          <button
                             className="rounded-xl bg-green-600 px-3 py-1 text-xs text-white hover:bg-green-700"
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(e) => { e.stopPropagation(); setVerifyModalLandlordId(l.id); setVBizName(l.name); }}
                           >
                             Claim &amp; Verify Your Business
-                          </a>
+                          </button>
                         )}
 
                         <button
@@ -1077,13 +1165,17 @@ onChange={(e) => setLandlordState(e.target.value)}
                 </a>
               )}
             </div>
+          ) : pendingVerification.has(selectedLandlord.id) ? (
+            <div className="mt-3 rounded-xl bg-yellow-50 border border-yellow-200 px-3 py-2 text-xs text-yellow-700 font-medium">
+              ⏳ Verification In Process — we'll be in touch soon.
+            </div>
           ) : (
-            <a
-              href="mailto:rentersreferenceservice@gmail.com?subject=Claim My Business Listing"
-              className="mt-3 inline-block rounded-xl border border-zinc-300 px-3 py-1.5 text-xs text-zinc-500 hover:border-zinc-500"
+            <button
+              className="mt-3 rounded-xl bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700"
+              onClick={() => { setVerifyModalLandlordId(selectedLandlord.id); setVBizName(selectedLandlord.name); }}
             >
               Claim &amp; Verify Your Business
-            </a>
+            </button>
           )}
         </>
       )}
