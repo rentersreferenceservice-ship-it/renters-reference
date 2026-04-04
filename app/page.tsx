@@ -464,38 +464,22 @@ function verifyReport(reportId: string) {
   setReports((prev) => prev.filter((r) => r.id !== reportId));
 }
 
-async function submitVerification(landlordId: string) {
+function submitVerification(landlordId: string) {
   if (!vBizName.trim() || !vAddress.trim() || !vPhone.trim() || !vEmail.trim()) {
     alert("Please fill in all required fields.");
     return;
   }
-  try {
-    const res = await fetch("/api/create-checkout-session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        landlordId,
-        bizName: vBizName,
-        address: vAddress,
-        phone: vPhone,
-        email: vEmail,
-        website: vWebsite,
-      }),
-    });
-    const data = await res.json();
-    if (data.error) { alert(`Error: ${data.error}`); return; }
-    const next = new Set(pendingVerification);
-    next.add(landlordId);
-    setPendingVerification(next);
-    localStorage.setItem("rr_pending_verify", JSON.stringify([...next]));
-    setVerifyModalLandlordId(null);
-    setVerifyStep(1);
-    setVBizName(""); setVAddress(""); setVPhone(""); setVEmail(""); setVWebsite("");
-    window.location.href = data.url;
-  } catch (err) {
-    alert("Could not start checkout. Please try again.");
-    console.error(err);
-  }
+  const next = new Set(pendingVerification);
+  next.add(landlordId);
+  setPendingVerification(next);
+  localStorage.setItem("rr_pending_verify", JSON.stringify([...next]));
+  setVerifyModalLandlordId(null);
+  setVerifyStep(1);
+  setVBizName(""); setVAddress(""); setVPhone(""); setVEmail(""); setVWebsite("");
+  const url = new URL("https://buy.stripe.com/3cI4gr56A5gifNxgPe5Vu00");
+  url.searchParams.set("prefilled_email", vEmail);
+  url.searchParams.set("client_reference_id", landlordId);
+  window.location.href = url.toString();
 }
 
   return (
