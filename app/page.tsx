@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -11,7 +10,14 @@ export default function LandingPage() {
 
       {/* NAV */}
       <nav className="relative z-10 flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur border-b">
-        <Image src="/logo.png" alt="Renters Reference" width={180} height={60} className="object-contain" />
+        <div className="flex items-center gap-3">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 4L4 18V40H16V28H28V40H40V18L22 4Z" stroke="#18181b" strokeWidth="2.5" strokeLinejoin="round" fill="white"/>
+            <rect x="13" y="18" width="18" height="18" rx="1" stroke="#18181b" strokeWidth="2" fill="white"/>
+            <text x="22" y="32" textAnchor="middle" fontFamily="serif" fontWeight="bold" fontSize="13" fill="#18181b">R</text>
+          </svg>
+          <span className="text-xl font-bold tracking-tight text-zinc-900">Renters Reference</span>
+        </div>
         <div className="flex gap-3">
           <a href="/login" className="rounded-xl border bg-white px-4 py-2 text-sm">Log In</a>
           <a href="/login" className="rounded-xl px-4 py-2 text-sm text-zinc-800" style={{ backgroundColor: "#F5D87A" }}>Create Account</a>
