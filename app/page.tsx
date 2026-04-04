@@ -656,7 +656,7 @@ return (
                         </div>
                       </button>
 
-                      <div className="mt-3 flex gap-3">
+                      <div className="mt-3 flex flex-wrap gap-3 items-center">
                         <button
                           className="text-sm underline"
                           onClick={() => {
@@ -668,6 +668,20 @@ return (
                         >
                           Add report
                         </button>
+
+                        {l.verified ? (
+                          <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                            ✓ Verified Business
+                          </span>
+                        ) : (
+                          <a
+                            href={`mailto:rentersreferenceservice@gmail.com?subject=Claim My Business Listing - ${encodeURIComponent(l.name)}`}
+                            className="rounded-xl bg-green-600 px-3 py-1 text-xs text-white hover:bg-green-700"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Claim &amp; Verify Your Business
+                          </a>
+                        )}
 
                         <button
                           className="text-sm underline text-red-600"
