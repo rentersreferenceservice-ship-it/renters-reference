@@ -3,7 +3,9 @@ import Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+    const key = process.env.STRIPE_SECRET_KEY;
+    console.log("STRIPE KEY PRESENT:", !!key, "STARTS WITH:", key?.slice(0, 7));
+    const stripe = new Stripe(key!);
     const { landlordId, bizName, address, phone, email, website } = await req.json();
     const origin = req.headers.get("origin") ?? "http://localhost:3000";
 
