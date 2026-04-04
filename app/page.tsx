@@ -481,7 +481,7 @@ function verifyReport(reportId: string) {
    Dashboard
   </button>
 </div>
-       <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2">
+       <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-[1fr_1fr_200px]">
           {/* LEFT: list */}
           <div className={mobilePanel === "list" ? "block" : "hidden md:block"}>
            <div className="flex items-center justify-between">
@@ -569,15 +569,6 @@ function verifyReport(reportId: string) {
   />
 </div>
 
-{filterState && (
-  <div className="mt-4 rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 px-4 py-3 text-center text-sm text-zinc-500">
-    <div className="font-medium text-zinc-600">Your Ad Here</div>
-    <div>Reach Renters in {Object.entries(STATE_NAME_TO_CODE).find(([, code]) => code === filterState)?.[0].replace(/\b\w/g, c => c.toUpperCase()) ?? filterState}</div>
-    <a href="mailto:rentersreferenceservice@gmail.com" className="mt-1 block text-xs underline text-zinc-400">
-      rentersreferenceservice@gmail.com
-    </a>
-  </div>
-)}
 
 {landlords.length === 0 ? (
               <p className="mt-2 text-zinc-600">No landlords yet.</p>
@@ -1043,6 +1034,38 @@ onChange={(e) => setLandlordState(e.target.value)}
      </>
 )}
           </div>
+
+          {/* RIGHT: ads column */}
+          <div className="hidden md:flex flex-col gap-4">
+            {filterState && (
+              <>
+                <div className="rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-4 text-center text-sm text-zinc-500">
+                  <div className="font-medium text-zinc-600">Your Ad Here</div>
+                  <div className="mt-1 text-xs">Reach Renters in {Object.entries(STATE_NAME_TO_CODE).find(([, code]) => code === filterState)?.[0].replace(/\b\w/g, c => c.toUpperCase()) ?? filterState}</div>
+                  <a href="mailto:rentersreferenceservice@gmail.com" className="mt-2 block text-xs underline text-zinc-400">
+                    rentersreferenceservice@gmail.com
+                  </a>
+                </div>
+
+                <div className="rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-4 text-center text-sm text-zinc-500">
+                  <div className="font-medium text-zinc-600">Your Ad Here</div>
+                  <div className="mt-1 text-xs">Reach Renters in {Object.entries(STATE_NAME_TO_CODE).find(([, code]) => code === filterState)?.[0].replace(/\b\w/g, c => c.toUpperCase()) ?? filterState}</div>
+                  <a href="mailto:rentersreferenceservice@gmail.com" className="mt-2 block text-xs underline text-zinc-400">
+                    rentersreferenceservice@gmail.com
+                  </a>
+                </div>
+
+                <div className="rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-4 text-center text-sm text-zinc-500">
+                  <div className="font-medium text-zinc-600">Your Ad Here</div>
+                  <div className="mt-1 text-xs">Reach Renters in {Object.entries(STATE_NAME_TO_CODE).find(([, code]) => code === filterState)?.[0].replace(/\b\w/g, c => c.toUpperCase()) ?? filterState}</div>
+                  <a href="mailto:rentersreferenceservice@gmail.com" className="mt-2 block text-xs underline text-zinc-400">
+                    rentersreferenceservice@gmail.com
+                  </a>
+                </div>
+              </>
+            )}
+          </div>
+
         </div>
       </div>
     </div>
