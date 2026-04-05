@@ -13,10 +13,10 @@ export async function POST(req: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const { error } = await supabase.rpc("set_landlord_verified", {
-    p_id: parseInt(landlordId, 10),
-    p_verified: unverify ? false : true,
-  });
+  const { error } = await supabase
+    .from("landlords")
+    .update({ verified: unverify ? false : true })
+    .eq("id", parseInt(landlordId, 10));
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
