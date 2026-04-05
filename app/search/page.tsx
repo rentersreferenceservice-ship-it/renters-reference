@@ -908,6 +908,15 @@ return (
                           </button>
                         )}
 
+                        {l.verified && (
+                          <div className="mt-2 space-y-1">
+                            {l.contactInfo && <div className="text-xs text-zinc-600">📞 {l.contactInfo}</div>}
+                            {l.address && <div className="text-xs text-zinc-600">📍 {l.address}</div>}
+                            {l.businessEmail && <a href={`mailto:${l.businessEmail}`} className="text-xs text-zinc-600 underline block">✉️ {l.businessEmail}</a>}
+                            {l.website && <a href={l.website} target="_blank" rel="noopener noreferrer" className="text-xs text-zinc-600 underline block">🌐 {l.website}</a>}
+                          </div>
+                        )}
+
                         <button
                           className="text-sm underline text-red-600"
                           onClick={() => removeLandlord(l.id)}
