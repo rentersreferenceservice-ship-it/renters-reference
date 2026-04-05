@@ -37,7 +37,6 @@ export default function AdminPage() {
     const { data, error } = await supabase
       .from("landlords")
       .select("*")
-      .order("verified", { ascending: true })
       .order("name");
     if (error) setMessage(`Error: ${error.message}`);
     setLandlords(data ?? []);
