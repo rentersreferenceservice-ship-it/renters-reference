@@ -186,7 +186,7 @@ useEffect(() => {
             landlordType: "PRIVATE",
             createdAt: l.created_at ?? new Date().toISOString(),
             verified: l.verified ?? false,
-            contactInfo: l.contact_info ?? (console.log("contact_info raw:", l.contact_info, "for", l.name), ""),
+            contactInfo: (console.log("contact_info raw:", l.contact_info, "for", l.name), l.contact_info ?? ""),
             website: l.website ?? "",
             address: l.address ?? "",
             businessEmail: l.business_email ?? "",
