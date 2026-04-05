@@ -55,7 +55,8 @@ export default function AdminPage() {
       setMessage("Verified!");
       setLandlords(prev => prev.map(l => l.id === id ? { ...l, verified: true } : l));
     } else {
-      setMessage("Error verifying landlord.");
+      const data = await res.json().catch(() => ({}));
+      setMessage(`Error: ${data.error ?? res.status}`);
     }
     setTimeout(() => setMessage(""), 3000);
   }
