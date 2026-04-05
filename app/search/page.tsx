@@ -588,7 +588,7 @@ async function submitVerification(landlordId: string) {
                         <div className="text-xs text-zinc-500">{l.city}, {l.state}</div>
                       </div>
                       {l.verified ? (
-                        <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#fef9c3", color: "#854d0e" }}>✓ Verified</span>
+                        <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#4a7c59", color: "#ffffff" }}>✓ Verified</span>
                       ) : pendingVerification.has(l.id) ? (
                         <span className="rounded-xl bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-700">Verification In Process</span>
                       ) : (
@@ -892,7 +892,7 @@ return (
                         </button>
 
                         {l.verified ? (
-                          <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#fef9c3", color: "#854d0e" }}>
+                          <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#4a7c59", color: "#ffffff" }}>
                             ✓ Verified Business
                           </span>
                         ) : pendingVerification.has(l.id) ? (
