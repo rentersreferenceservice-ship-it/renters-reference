@@ -32,7 +32,7 @@ export default function LandingPage() {
           ))}
         </div>
         <h1 className="text-4xl font-bold tracking-tight text-zinc-900 leading-tight">
-          Know Your Landlord Before You Sign.
+          Tenants: Rent with Confidence.<br/>Landlords: Protect Your Investment.
         </h1>
         <p className="mt-3 text-base text-zinc-500 max-w-lg">
           Real reviews from real tenants — repair speed, deposit returns, and overall experience. Free, anonymous, and honest.
