@@ -467,11 +467,32 @@ function verifyReport(reportId: string) {
   setReports((prev) => prev.filter((r) => r.id !== reportId));
 }
 
-function submitVerification(landlordId: string) {
+async function submitVerification(landlordId: string) {
   if (!vBizName.trim() || !vAddress.trim() || !vPhone.trim() || !vEmail.trim()) {
     alert("Please fill in all required fields.");
     return;
   }
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { error } = await supabase
+    .from("landlords")
+    .update({
+      contact_info: vPhone,
+      address: vAddress,
+      business_email: vEmail,
+      website: vWebsite ?? "",
+    })
+    .eq("id", landlordId);
+
+  if (error) {
+    alert("Could not save your information. Please try again.");
+    return;
+  }
+
   const next = new Set(pendingVerification);
   next.add(landlordId);
   setPendingVerification(next);

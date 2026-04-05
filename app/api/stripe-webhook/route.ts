@@ -23,10 +23,10 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const meta = session.metadata;
+    const landlordId = session.client_reference_id;
 
-    if (!meta?.landlord_id) {
-      return NextResponse.json({ error: "No landlord_id in metadata" }, { status: 400 });
+    if (!landlordId) {
+      return NextResponse.json({ error: "No client_reference_id in session" }, { status: 400 });
     }
 
     const supabase = createClient(
@@ -36,14 +36,8 @@ export async function POST(req: NextRequest) {
 
     const { error } = await supabase
       .from("landlords")
-      .update({
-        verified: true,
-        contact_info: meta.phone ?? "",
-        website: meta.website ?? "",
-        address: meta.address ?? "",
-        business_email: meta.email ?? "",
-      })
-      .eq("id", meta.landlord_id);
+      .update({ verified: true })
+      .eq("id", landlordId);
 
     if (error) {
       console.error("Supabase update error:", error);
