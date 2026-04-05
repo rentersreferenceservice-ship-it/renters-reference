@@ -1,5 +1,5 @@
 "use client";
-// force redeploy
+// force redeploy 2
 import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
