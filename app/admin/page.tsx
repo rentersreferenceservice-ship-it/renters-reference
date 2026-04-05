@@ -34,11 +34,12 @@ export default function AdminPage() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
     setLoading(true);
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("landlords")
       .select("*")
       .order("verified", { ascending: true })
       .order("name");
+    if (error) setMessage(`Error: ${error.message}`);
     setLandlords(data ?? []);
     setLoading(false);
   }
