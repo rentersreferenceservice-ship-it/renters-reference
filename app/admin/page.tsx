@@ -23,6 +23,8 @@ export default function AdminPage() {
   const [landlords, setLandlords] = useState<Landlord[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     if (authed) fetchLandlords();
@@ -73,6 +75,16 @@ export default function AdminPage() {
     setTimeout(() => setMessage(""), 3000);
   }
 
+  const hasPendingInfo = (l: Landlord) =>
+    !!(l.contact_info || l.address || l.business_email || l.website);
+
+  const filtered = landlords
+    .filter(l => showAll || hasPendingInfo(l))
+    .filter(l => l.name.toLowerCase().includes(search.toLowerCase()) ||
+      l.city?.toLowerCase().includes(search.toLowerCase()));
+
+  const pendingCount = landlords.filter(l => hasPendingInfo(l) && !l.verified).length;
+
   if (!authed) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-900">
@@ -101,15 +113,39 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100 p-8">
-      <h1 className="text-2xl font-bold mb-6 text-zinc-900">Verification Admin</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold text-zinc-900">Verification Admin</h1>
+        {pendingCount > 0 && (
+          <span className="text-sm font-semibold text-yellow-700 bg-yellow-100 px-3 py-1 rounded-full">
+            {pendingCount} pending
+          </span>
+        )}
+      </div>
+
+      <div className="flex gap-3 mb-4">
+        <input
+          className="flex-1 border rounded-xl px-4 py-2 text-sm"
+          placeholder="Search by name or city..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        <button
+          className="rounded-xl px-4 py-2 text-sm font-medium border bg-white text-zinc-700"
+          onClick={() => setShowAll(v => !v)}
+        >
+          {showAll ? "Show Pending Only" : "Show All"}
+        </button>
+      </div>
+
       {message && <div className="mb-4 text-green-700 font-medium">{message}</div>}
+
       {loading ? (
         <p>Loading...</p>
-      ) : landlords.length === 0 ? (
-        <p className="text-zinc-500">No landlords with verification info found.</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-zinc-500">No landlords found.</p>
       ) : (
         <div className="space-y-4">
-          {landlords.map(l => (
+          {filtered.map(l => (
             <div key={l.id} className="bg-white rounded-2xl p-5 shadow flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <div>
