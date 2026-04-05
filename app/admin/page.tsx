@@ -37,7 +37,6 @@ export default function AdminPage() {
     const { data } = await supabase
       .from("landlords")
       .select("*")
-      .or("contact_info.neq.,address.neq.,business_email.neq.")
       .order("verified", { ascending: true })
       .order("name");
     setLandlords(data ?? []);
