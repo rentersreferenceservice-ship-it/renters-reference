@@ -480,7 +480,8 @@ async function submitVerification(landlordId: string) {
   });
 
   if (!res.ok) {
-    alert("Could not save your information. Please try again.");
+    const data = await res.json().catch(() => ({}));
+    alert(`Could not save your information: ${data.error ?? res.status}`);
     return;
   }
 
