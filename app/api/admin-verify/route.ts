@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   );
 
   const { error } = await supabase.rpc("set_landlord_verified", {
-    p_id: landlordId,
+    p_id: parseInt(landlordId, 10),
     p_verified: unverify ? false : true,
   });
 
