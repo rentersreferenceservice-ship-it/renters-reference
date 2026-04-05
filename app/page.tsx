@@ -34,9 +34,7 @@ export default function LandingPage() {
         <h1 className="text-4xl font-bold tracking-tight text-zinc-900 leading-tight">
           Tenants: Rent with Confidence.<br/>Landlords: Protect Your Investment.
         </h1>
-        <p className="mt-3 text-base text-zinc-500 max-w-lg">
-          Real reviews from real tenants — repair speed, deposit returns, and overall experience. Free, anonymous, and honest.
-        </p>
+
         <div className="mt-5 flex gap-3 flex-wrap justify-center">
           <button className="rounded-xl px-7 py-2.5 text-sm font-medium text-zinc-800 shadow-md" style={{ backgroundColor: "#F5D87A" }} onClick={() => router.push("/search")}>
             Search Landlords
