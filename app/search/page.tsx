@@ -473,22 +473,13 @@ async function submitVerification(landlordId: string) {
     return;
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const res = await fetch("/api/save-verification", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ landlordId, phone: vPhone, address: vAddress, email: vEmail, website: vWebsite ?? "" }),
+  });
 
-  const { error } = await supabase
-    .from("landlords")
-    .update({
-      contact_info: vPhone,
-      address: vAddress,
-      business_email: vEmail,
-      website: vWebsite ?? "",
-    })
-    .eq("id", landlordId);
-
-  if (error) {
+  if (!res.ok) {
     alert("Could not save your information. Please try again.");
     return;
   }
