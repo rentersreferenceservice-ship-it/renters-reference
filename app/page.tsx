@@ -57,7 +57,6 @@ export default function LandingPage() {
         <div className="flex flex-col justify-center px-10 py-8 bg-zinc-900 md:border-r border-t overflow-hidden">
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm" style={{ backgroundColor: "#F5D87A" }}>🔍</div>
           <div className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-1">For Tenants</div>
-          <h2 className="text-xl font-bold text-white mb-4">Tenants: Rent with Confidence.</h2>
           <div className="space-y-3">
             {[
               { icon: "⭐", title: "Honest Reviews", desc: "Repair responsiveness, deposit returns, and overall experience from past tenants" },
@@ -83,7 +82,6 @@ export default function LandingPage() {
         <div className="flex flex-col justify-center px-10 py-8 bg-zinc-900 border-t overflow-hidden">
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm" style={{ backgroundColor: "#F5D87A" }}>🏅</div>
           <div className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-1">For Landlords</div>
-          <h2 className="text-xl font-bold text-white mb-4">Landlords: Protect Your Investment.</h2>
           <div className="space-y-3">
             {[
               { icon: "✓", title: "Verified Badge", desc: "Stand out with a trusted verified badge that quality tenants look for" },
