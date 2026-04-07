@@ -838,7 +838,7 @@ const overall =
 
 return (
       <li
-  key={l.id}
+  key={`${l.id}-${l.name}`}
   className="rounded-xl border p-4 cursor-pointer"
   onClick={() => {
     setSelectedLandlordId(l.id);
