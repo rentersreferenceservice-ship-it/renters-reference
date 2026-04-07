@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import StarRating from "@/components/StarRating";
 import { createClient } from "@supabase/supabase-js";
+import { getSupabase } from "@/lib/supabaseClient";
 
 type Landlord = {
   id: string;
@@ -110,6 +111,7 @@ export default function Home() {
   const [vWebsite, setVWebsite] = useState("");
   
   const [reports, setReports] = useState<Report[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // UI
   const [view, setView] = useState<"list" | "addLandlord" | "addReport">("list");
@@ -159,6 +161,9 @@ useEffect(() => {
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
+
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
 
       let allLandlords: any[] = [];
       let from = 0;
@@ -526,13 +531,19 @@ async function submitVerification(landlordId: string) {
           </div>
 
           <div className="flex flex-col items-end gap-2">
-            <a
-              href="/login"
-              className="rounded-xl border px-4 py-2 text-sm"
-              title="Login (we'll connect this to roles next)"
-            >
-              Login
-            </a>
+            {isLoggedIn ? (
+              <button
+                className="rounded-xl border px-4 py-2 text-sm"
+                onClick={async () => { const s = getSupabase(); await s.auth.signOut(); setIsLoggedIn(false); }}
+              >
+                Log Out
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                <a href="/login" className="rounded-xl border px-4 py-2 text-sm">Log In</a>
+                <a href="/login" className="rounded-xl px-4 py-2 text-sm font-medium text-zinc-800" style={{ backgroundColor: "#F5D87A" }}>Create Account</a>
+              </div>
+            )}
             <button
               className="rounded-xl px-4 py-2 text-sm text-zinc-800" style={{ backgroundColor: "#F5D87A" }}
               onClick={() => { setClaimModalOpen(true); setClaimSearch(""); }}
@@ -879,17 +890,23 @@ return (
                       </button>
 
                       <div className="mt-3 flex flex-wrap gap-3 items-center">
-                        <button
-                          className="text-sm underline"
-                          onClick={() => {
-                            setSelectedLandlordId(l.id);
-                            resetForms();
-                            setView("addReport");
-                            setReportLandlordId(l.id);
-                          }}
-                        >
-                          Add report
-                        </button>
+                        {isLoggedIn ? (
+                          <button
+                            className="text-sm underline"
+                            onClick={() => {
+                              setSelectedLandlordId(l.id);
+                              resetForms();
+                              setView("addReport");
+                              setReportLandlordId(l.id);
+                            }}
+                          >
+                            Add report
+                          </button>
+                        ) : (
+                          <a href="/login" className="text-sm underline text-zinc-500">
+                            Log in to add a report
+                          </a>
+                        )}
 
                         {l.verified ? (
                           <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#4a7c59", color: "#ffffff" }}>
@@ -1189,15 +1206,21 @@ onChange={(e) => setLandlordState(e.target.value)}
         Add landlord
       </button>
 
-      <button
-        className="w-full rounded-xl border px-4 py-2 text-sm"
-        onClick={() => {
-          resetForms();
-          setView("addReport");
-        }}
-      >
-        Add report
-      </button>
+      {isLoggedIn ? (
+        <button
+          className="w-full rounded-xl border px-4 py-2 text-sm"
+          onClick={() => {
+            resetForms();
+            setView("addReport");
+          }}
+        >
+          Add report
+        </button>
+      ) : (
+        <a href="/login" className="block w-full rounded-xl border px-4 py-2 text-sm text-center text-zinc-500">
+          Log in to add a report
+        </a>
+      )}
     </div>
 
     {/* LANDLORD CARD */}
