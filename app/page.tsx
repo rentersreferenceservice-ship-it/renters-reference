@@ -20,7 +20,7 @@ export default function LandingPage() {
         </div>
         <div className="flex gap-3">
           <a href="/login" className="rounded-xl border bg-white px-4 py-1.5 text-sm">Log In</a>
-          <a href="/login" className="rounded-xl px-4 py-1.5 text-sm font-medium text-zinc-800" style={{ backgroundColor: "#F5D87A" }}>Create Account</a>
+          <a href="/login?mode=signup" className="rounded-xl px-4 py-1.5 text-sm font-medium text-zinc-800" style={{ backgroundColor: "#F5D87A" }}>Create Account</a>
         </div>
       </nav>
 

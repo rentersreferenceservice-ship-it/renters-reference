@@ -541,7 +541,7 @@ async function submitVerification(landlordId: string) {
             ) : (
               <div className="flex gap-2">
                 <a href="/login" className="rounded-xl border px-4 py-2 text-sm">Log In</a>
-                <a href="/login" className="rounded-xl px-4 py-2 text-sm font-medium text-zinc-800" style={{ backgroundColor: "#F5D87A" }}>Create Account</a>
+                <a href="/login?mode=signup" className="rounded-xl px-4 py-2 text-sm font-medium text-zinc-800" style={{ backgroundColor: "#F5D87A" }}>Create Account</a>
               </div>
             )}
             <button
