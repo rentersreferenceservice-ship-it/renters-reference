@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getSupabase } from "@/lib/supabaseClient";
 import { useRouter, useSearchParams } from "next/navigation";
 export default function LoginClient() {
@@ -77,7 +77,7 @@ return;
           setMsg(error.message);
           return;
         }
-        setMsg("Account created! Check your email to confirm, then log in.");
+        setMsg("Account created! You can now log in.");
         setMode("login");
         setPw("");
       }
