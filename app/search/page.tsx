@@ -174,6 +174,7 @@ useEffect(() => {
           .select("*")
           .order("created_at", { ascending: false })
           .range(from, from + batchSize - 1);
+        console.log("LANDLORD BATCH:", from, "error:", error, "count:", data?.length);
         if (error) { console.error("LANDLORD FETCH ERROR:", error); break; }
         if (!data || data.length === 0) break;
         allLandlords = allLandlords.concat(data);
