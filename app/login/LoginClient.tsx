@@ -27,7 +27,7 @@ const router = useRouter();
   const { error: resetError } = await supabase.auth.resetPasswordForEmail(
     cleanEmail,
     {
-      redirectTo: "https://rentersreference.org/reset-password",
+      redirectTo: "https://renters-reference-ft3f.vercel.app/reset-password",
     }
   );
 
