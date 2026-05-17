@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
+
+const SUPABASE_URL = "https://iwfnkmgiittsxylwxydz.supabase.co";
 
 export async function POST(req: NextRequest) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -17,7 +18,6 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err: any) {
-    console.error("Webhook signature error:", err.message);
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
 
@@ -26,22 +26,27 @@ export async function POST(req: NextRequest) {
     const landlordId = session.client_reference_id;
 
     if (!landlordId) {
-      return NextResponse.json({ error: "No client_reference_id in session" }, { status: 400 });
+      return NextResponse.json({ error: "No client_reference_id" }, { status: 400 });
     }
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/landlords?id=eq.${parseInt(landlordId, 10)}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": serviceKey,
+          "Authorization": `Bearer ${serviceKey}`,
+          "Prefer": "return=minimal",
+        },
+        body: JSON.stringify({ verified: true }),
+      }
     );
 
-    const { error } = await supabase
-      .from("landlords")
-      .update({ verified: true })
-      .eq("id", landlordId);
-
-    if (error) {
-      console.error("Supabase update error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!res.ok) {
+      const text = await res.text();
+      return NextResponse.json({ error: text }, { status: 500 });
     }
   }
 
