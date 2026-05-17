@@ -158,8 +158,8 @@ useEffect(() => {
   async function run() {
     try {
       const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        process.env.NEXT_PUBLIC_SUPABASE_URL || "https://iwfnkmgiittsxylwxydz.supabase.co",
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3Zm5rbWdpaXR0c3h5bHd4eWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMjk0NzYsImV4cCI6MjA5NDYwNTQ3Nn0.sQOwz-7wPKAMI6d3QKFKk8pOV_N2YQS4HN1q1WTAiMw"
       );
 
       const { data: { session } } = await supabase.auth.getSession();
