@@ -1,5 +1,4 @@
 "use client";
-// force production refresh
 
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -174,8 +173,7 @@ useEffect(() => {
           .select("*")
           .order("created_at", { ascending: false })
           .range(from, from + batchSize - 1);
-        console.log("LANDLORD BATCH:", from, "error:", error, "count:", data?.length);
-        if (error) { console.error("LANDLORD FETCH ERROR:", error); break; }
+        if (error) break;
         if (!data || data.length === 0) break;
         allLandlords = allLandlords.concat(data);
         if (data.length < batchSize) break;
@@ -193,7 +191,7 @@ useEffect(() => {
             landlordType: "PRIVATE",
             createdAt: l.created_at ?? new Date().toISOString(),
             verified: l.verified ?? false,
-            contactInfo: (console.log("contact_info raw:", l.contact_info, "for", l.name), l.contact_info ?? ""),
+            contactInfo: l.contact_info ?? "",
             website: l.website ?? "",
             address: l.address ?? "",
             businessEmail: l.business_email ?? "",
@@ -206,9 +204,6 @@ useEffect(() => {
         .select("*")
         .order("created_at", { ascending: false })
         .limit(20000);
-
-      console.log("FETCH REPORTS RESULT", reportsRes);
-      console.log("FETCH REPORTS DATA", reportsRes.data);
 
       if (!reportsRes.error && reportsRes.data) {
         setReports(
@@ -227,8 +222,6 @@ useEffect(() => {
             utilitiesIncluded: r.utilities_included ?? false,
           })) as any
         );
-      } else {
-        console.log("REPORTS ERROR:", reportsRes.error);
       }
     } catch (err) {
       console.error("LOAD DATA ERROR:", err);
@@ -309,15 +302,10 @@ const filteredLandlords = useMemo(() => {
   city,
   state,
 };
-  console.log("SAVE LANDLORD PAYLOAD", payload);
-  console.log("SUPABASE URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
-
   const { data, error } = await supabase
     .from("landlords")
     .insert([payload])
     .select("*");
-
-  console.log("SAVE LANDLORD RESPONSE", { data, error });
 
   if (error) {
     console.error("Save landlord error:", error);
@@ -1148,9 +1136,6 @@ onChange={(e) => setLandlordState(e.target.value)}
                   Short note (1–2 sentences)
                 </label>
                <div className="text-xs text-zinc-500">
-  Reports are anonymous and publicly visible. Do not include unit numbers, exact dates, or identifying details. Submit reports after your tenancy has ended and focus on factual experiences.
-</div> 
-<div className="text-xs text-zinc-500">
   Reports are anonymous and publicly visible. Do not include unit numbers, exact dates, or identifying details. Submit reports after your tenancy has ended and focus on factual experiences.
 </div>
              <textarea
