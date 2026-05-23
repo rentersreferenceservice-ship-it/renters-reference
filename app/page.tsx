@@ -105,8 +105,20 @@ export default function LandingPage() {
 
       </section>
 
+      {/* LANDLORD MISSION BANNER */}
+      <div className="mission-banner relative z-10 flex-shrink-0 w-full text-center px-6 py-3 border-t" style={{ backgroundColor: "#F5D87A" }}>
+        <p className="text-sm font-bold text-zinc-800">🏠 Landlords — verify your page, attract better tenants, and turn your subscription into a donation.</p>
+        <p className="text-xs text-zinc-700 mt-0.5">A for-profit social enterprise · 75% of proceeds support homeless and housing initiatives in your state.</p>
+        <button
+          onClick={() => router.push("/search")}
+          className="mt-2 rounded-xl px-5 py-1.5 text-xs font-medium bg-zinc-800 text-white"
+        >
+          Claim Your Profile →
+        </button>
+      </div>
+
       {/* FOOTER */}
-      <footer className="relative z-10 text-center py-2.5 text-xs text-zinc-400 border-t bg-white/90 backdrop-blur flex-shrink-0">
+      <footer className="relative z-10 text-center py-2 text-xs text-zinc-400 border-t bg-white/90 backdrop-blur flex-shrink-0">
         © {new Date().getFullYear()} Renters Reference ·{" "}
         <a href="mailto:rentersreferenceservice@gmail.com" className="underline">Contact Us</a>
       </footer>

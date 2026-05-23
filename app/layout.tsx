@@ -37,12 +37,6 @@ export default function RootLayout({
     backgroundPosition: "top left",
   }}
 ></div>
-  {/* MISSION BANNER */}
-  <div className="mission-banner relative z-20 w-full text-center px-4 py-2" style={{ backgroundColor: "#F5D87A" }}>
-    <p className="text-sm font-bold text-zinc-800">🏠 Landlords — turn your subscription into a donation.</p>
-    <p className="text-xs text-zinc-700">A for-profit social enterprise · 75% of proceeds support homeless and housing initiatives in your state.</p>
-  </div>
-
   {/* APP CONTENT */}
 <div className="min-h-screen relative z-10 bg-transparent">
   {/* force redeploy */}
