@@ -489,8 +489,8 @@ async function submitVerification(landlordId: string) {
   setVerifyStep(1);
   setVBizName(""); setVAddress(""); setVPhone(""); setVEmail(""); setVWebsite("");
   const stripeLinks: Record<string, string> = {
-    monthly: "https://buy.stripe.com/MONTHLY_LINK_PLACEHOLDER",
-    annual:  "https://buy.stripe.com/3cI4gr56A5gifNxgPe5Vu00",
+    monthly: "https://buy.stripe.com/28E28j1Uo7oqfNxaqQ5Vu01",
+    annual:  "https://buy.stripe.com/3cIfZ942wbEG0SDeH65Vu02",
   };
   const url = new URL(stripeLinks[verifyPlan]);
   url.searchParams.set("prefilled_email", vEmail);
