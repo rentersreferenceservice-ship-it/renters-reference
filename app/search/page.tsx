@@ -108,6 +108,7 @@ export default function Home() {
   const [vPhone, setVPhone] = useState("");
   const [vEmail, setVEmail] = useState("");
   const [vWebsite, setVWebsite] = useState("");
+  const [verifyPlan, setVerifyPlan] = useState<"monthly" | "annual">("monthly");
   
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -487,7 +488,11 @@ async function submitVerification(landlordId: string) {
   setVerifyModalLandlordId(null);
   setVerifyStep(1);
   setVBizName(""); setVAddress(""); setVPhone(""); setVEmail(""); setVWebsite("");
-  const url = new URL("https://buy.stripe.com/3cI4gr56A5gifNxgPe5Vu00");
+  const stripeLinks: Record<string, string> = {
+    monthly: "https://buy.stripe.com/MONTHLY_LINK_PLACEHOLDER",
+    annual:  "https://buy.stripe.com/3cI4gr56A5gifNxgPe5Vu00",
+  };
+  const url = new URL(stripeLinks[verifyPlan]);
   url.searchParams.set("prefilled_email", vEmail);
   url.searchParams.set("client_reference_id", landlordId);
   window.location.href = url.toString();
@@ -672,19 +677,34 @@ async function submitVerification(landlordId: string) {
                   </div>
 
                   <div className="mt-4 rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 p-4">
-                    <div className="text-sm font-medium text-zinc-700 mb-1">Verification Fee</div>
-                    <div className="text-xs text-zinc-500 mb-2">An annual fee is required to verify your business listing. Your verified badge and contact info will appear on your profile immediately after payment.</div>
-                    <div className="text-lg font-bold text-zinc-800">$29.99 <span className="text-xs font-normal text-zinc-500">/ year</span></div>
+                    <div className="text-sm font-medium text-zinc-700 mb-2">Choose Your Plan</div>
+                    <div className="text-xs text-zinc-500 mb-3">Your verified badge and contact info will appear on your profile immediately after payment. Cancel anytime.</div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setVerifyPlan("monthly")}
+                        className={`flex-1 rounded-xl border-2 p-3 text-left transition-all ${verifyPlan === "monthly" ? "border-zinc-800 bg-white" : "border-zinc-200 bg-white"}`}
+                      >
+                        <div className="text-xs font-semibold text-zinc-500 mb-0.5">MONTHLY</div>
+                        <div className="text-lg font-bold text-zinc-800">$29.99<span className="text-xs font-normal text-zinc-500">/mo</span></div>
+                      </button>
+                      <button
+                        onClick={() => setVerifyPlan("annual")}
+                        className={`flex-1 rounded-xl border-2 p-3 text-left transition-all ${verifyPlan === "annual" ? "border-zinc-800 bg-white" : "border-zinc-200 bg-white"}`}
+                      >
+                        <div className="text-xs font-semibold text-zinc-500 mb-0.5">ANNUAL <span className="text-green-600">Save $60</span></div>
+                        <div className="text-lg font-bold text-zinc-800">$299<span className="text-xs font-normal text-zinc-500">/yr</span></div>
+                      </button>
+                    </div>
                   </div>
 
                   <div className="mt-5 flex gap-3">
                     <button className="rounded-xl border px-4 py-2 text-sm" onClick={() => setVerifyStep(1)}>← Back</button>
                     <button
-                      className="flex-1 rounded-xl px-4 py-2 text-sm text-white"
+                      className="flex-1 rounded-xl px-4 py-2 text-sm font-medium text-zinc-800"
                       style={{ backgroundColor: "#F5D87A" }}
                       onClick={() => submitVerification(verifyModalLandlordId)}
                     >
-                      Pay $29.99 &amp; Verify
+                      {verifyPlan === "monthly" ? "Pay $29.99/mo & Verify" : "Pay $299/yr & Verify"}
                     </button>
                   </div>
                 </>
