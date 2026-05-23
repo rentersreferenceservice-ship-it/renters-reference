@@ -66,7 +66,8 @@ const router = useRouter();
           setMsg(error.message);
           return;
         }
-        router.replace("/");
+        const redirect = searchParams.get("redirect");
+        router.replace(redirect && redirect.startsWith("/") ? redirect : "/");
 return;
       } else {
         const { error } = await supabase.auth.signUp({

@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
-const PASSWORD = "Manual Verification";
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 type Landlord = {
   id: string;
@@ -18,23 +22,28 @@ type Landlord = {
 };
 
 export default function AdminPage() {
+  const router = useRouter();
   const [authed, setAuthed] = useState(false);
-  const [input, setInput] = useState("");
   const [landlords, setLandlords] = useState<Landlord[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    if (authed) fetchLandlords();
-  }, [authed]);
+    async function init() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.replace("/login?redirect=/admin");
+        return;
+      }
+      setAuthed(true);
+      fetchLandlords();
+    }
+    init();
+  }, []);
 
   async function fetchLandlords() {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
     setLoading(true);
     const { data, error } = await supabase
       .from("landlords")
@@ -86,31 +95,7 @@ export default function AdminPage() {
 
   const pendingCount = landlords.filter(l => hasPendingInfo(l) && !l.verified).length;
 
-  if (!authed) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-900">
-        <div className="bg-white rounded-2xl p-8 w-80 shadow-xl">
-          <h1 className="text-xl font-bold mb-4 text-zinc-900">Admin Access</h1>
-          <input
-            type="password"
-            className="w-full border rounded-xl px-4 py-2 text-sm mb-3"
-            placeholder="Password"
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && input === PASSWORD && setAuthed(true)}
-          />
-          <button
-            className="w-full rounded-xl py-2 text-sm font-medium text-zinc-800"
-            style={{ backgroundColor: "#F5D87A" }}
-            onClick={() => input === PASSWORD ? setAuthed(true) : setMessage("Wrong password")}
-          >
-            Enter
-          </button>
-          {message && <p className="text-red-500 text-sm mt-2">{message}</p>}
-        </div>
-      </div>
-    );
-  }
+  if (!authed) return null;
 
   return (
     <div className="min-h-screen bg-zinc-100 p-8">
