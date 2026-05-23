@@ -28,7 +28,7 @@ export default function LandingPage() {
       <section className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-8 bg-white/80 backdrop-blur border-b flex-shrink-0">
         <div className="flex gap-1 mb-3">
           {[1,2,3,4,5].map(i => (
-            <span key={i} className="text-2xl" style={{ color: "#F5D87A", WebkitTextStroke: "1px #18181b" }}>★</span>
+            <span key={i} className="text-2xl" style={{ color: "#F5D87A", WebkitTextStroke: "2px #18181b", paintOrder: "stroke fill" }}>★</span>
           ))}
         </div>
         <h1 className="text-4xl font-bold tracking-tight text-zinc-900 leading-tight">
