@@ -28,7 +28,7 @@ export default function LandingPage() {
       <section className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-8 bg-white/80 backdrop-blur border-b flex-shrink-0">
         <div className="flex gap-1 mb-3">
           {[1,2,3,4,5].map(i => (
-            <span key={i} className="text-2xl" style={{ color: "#F5D87A" }}>★</span>
+            <span key={i} className="text-2xl" style={{ color: "#F5D87A", WebkitTextStroke: "1px #18181b" }}>★</span>
           ))}
         </div>
         <h1 className="text-4xl font-bold tracking-tight text-zinc-900 leading-tight">
@@ -103,7 +103,7 @@ export default function LandingPage() {
       </section>
 
       {/* LANDLORD MISSION BANNER */}
-      <div className="mission-banner relative z-10 flex-shrink-0 w-full text-center px-6 py-4 border-t" style={{ backgroundColor: "#F5D87A" }}>
+      <div className="mission-banner relative z-10 flex-shrink-0 w-full text-center px-6 py-4" style={{ backgroundColor: "#F5D87A" }}>
         <p className="text-xl font-extrabold text-zinc-900 leading-tight">75% of proceeds support homeless &amp; housing initiatives in your state.</p>
         <p className="text-xs font-semibold text-zinc-700 mt-1 uppercase tracking-widest">A for-profit social enterprise</p>
         <p className="text-xs text-zinc-700 mt-2">🏠 Landlords — verify your page, attract better tenants, and turn your subscription into a donation.</p>
