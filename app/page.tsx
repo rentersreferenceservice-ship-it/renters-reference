@@ -103,9 +103,10 @@ export default function LandingPage() {
       </section>
 
       {/* LANDLORD MISSION BANNER */}
-      <div className="mission-banner relative z-10 flex-shrink-0 w-full text-center px-6 py-3 border-t" style={{ backgroundColor: "#F5D87A" }}>
-        <p className="text-sm font-bold text-zinc-800">🏠 Landlords — verify your page, attract better tenants, and turn your subscription into a donation.</p>
-        <p className="text-xs text-zinc-700 mt-0.5">A for-profit social enterprise · 75% of proceeds support homeless and housing initiatives in your state.</p>
+      <div className="mission-banner relative z-10 flex-shrink-0 w-full text-center px-6 py-4 border-t" style={{ backgroundColor: "#F5D87A" }}>
+        <p className="text-xl font-extrabold text-zinc-900 leading-tight">75% of proceeds support homeless &amp; housing initiatives in your state.</p>
+        <p className="text-xs font-semibold text-zinc-700 mt-1 uppercase tracking-widest">A for-profit social enterprise</p>
+        <p className="text-xs text-zinc-700 mt-2">🏠 Landlords — verify your page, attract better tenants, and turn your subscription into a donation.</p>
         <button
           onClick={() => router.push("/search")}
           className="mt-2 rounded-xl px-5 py-1.5 text-xs font-medium bg-zinc-800 text-white"
