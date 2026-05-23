@@ -39,9 +39,6 @@ export default function LandingPage() {
           <button className="rounded-xl px-7 py-2.5 text-sm font-medium text-zinc-800 shadow-md" style={{ backgroundColor: "#F5D87A" }} onClick={() => router.push("/search")}>
             Search Landlords
           </button>
-          <button className="rounded-xl px-7 py-2.5 text-sm font-medium text-zinc-800 bg-white border shadow-md" onClick={() => router.push("/search")}>
-            Claim Your Profile
-          </button>
         </div>
         <div className="mt-5 flex gap-3 flex-wrap justify-center">
           <div className="rounded-full bg-white border px-4 py-1.5 text-xs text-zinc-600 shadow-sm">🏠 1,000+ Landlords Listed</div>
