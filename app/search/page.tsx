@@ -869,26 +869,16 @@ return (
   <div className="font-medium">
     {l.name} — {l.city}, {l.state}
     
-{overall !== null && (
-  <div className="text-sm text-zinc-700">
-   Overall rating: {overall} / 5 ({verifiedCount} verified of {totalCount})
   </div>
-)}
-  </div>
- 
-<div className="mt-2"></div>
 
-  
 <div className="mt-1 text-sm text-zinc-600">
   {count === 0 ? (
     "No reports yet."
   ) : (
     <>
-  <span className="font-semibold text-yellow-500">
-    stars(overall!)
-  </span>{" "}
-  ({overall}/5) • {count} {count === 1 ? "report" : "reports"}
-</>
+      {stars(overall!)}
+      {" "}{overall}/5 • {count} {count === 1 ? "report" : "reports"}
+    </>
   )}
 </div>
 </div>
