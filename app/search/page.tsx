@@ -921,7 +921,7 @@ return (
                             className="rounded-xl px-3 py-1 text-xs text-zinc-800" style={{ backgroundColor: "#F5D87A" }}
                             onClick={(e) => { e.stopPropagation(); setVerifyModalLandlordId(l.id); setVBizName(l.name); }}
                           >
-                            Claim &amp; Verify Your Business
+                            Verify Your Business
                           </button>
                         )}
 
@@ -1274,7 +1274,7 @@ onChange={(e) => setLandlordState(e.target.value)}
               className="mt-3 rounded-xl px-4 py-2 text-sm text-zinc-800" style={{ backgroundColor: "#F5D87A" }}
               onClick={() => { setVerifyModalLandlordId(selectedLandlord.id); setVBizName(selectedLandlord.name); }}
             >
-              Claim &amp; Verify Your Business
+              Verify Your Business
             </button>
           )}
         </>
