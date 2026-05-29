@@ -29,6 +29,11 @@ export default function AdminPage() {
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editPhone, setEditPhone] = useState("");
+  const [editAddress, setEditAddress] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editWebsite, setEditWebsite] = useState("");
 
   useEffect(() => {
     async function init() {
@@ -42,6 +47,30 @@ export default function AdminPage() {
     }
     init();
   }, []);
+
+  function startEdit(l: Landlord) {
+    setEditingId(l.id);
+    setEditPhone(l.contact_info ?? "");
+    setEditAddress(l.address ?? "");
+    setEditEmail(l.business_email ?? "");
+    setEditWebsite(l.website ?? "");
+  }
+
+  async function saveEdit(id: string) {
+    const res = await fetch("/api/admin-update-landlord", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ landlordId: id, phone: editPhone, address: editAddress, email: editEmail, website: editWebsite }),
+    });
+    if (res.ok) {
+      setLandlords(prev => prev.map(l => l.id === id ? { ...l, contact_info: editPhone, address: editAddress, business_email: editEmail, website: editWebsite } : l));
+      setEditingId(null);
+      setMessage("Info saved!");
+    } else {
+      setMessage("Error saving info.");
+    }
+    setTimeout(() => setMessage(""), 3000);
+  }
 
   async function fetchLandlords() {
     setLoading(true);
@@ -156,10 +185,26 @@ export default function AdminPage() {
                   </button>
                 )}
               </div>
-              {l.contact_info && <div className="text-sm text-zinc-600">📞 {l.contact_info}</div>}
-              {l.address && <div className="text-sm text-zinc-600">📍 {l.address}</div>}
-              {l.business_email && <div className="text-sm text-zinc-600">✉️ {l.business_email}</div>}
-              {l.website && <div className="text-sm text-zinc-600">🌐 {l.website}</div>}
+              {editingId === l.id ? (
+                <div className="flex flex-col gap-2 mt-1">
+                  <input className="border rounded-xl px-3 py-2 text-sm" placeholder="📞 Phone" value={editPhone} onChange={e => setEditPhone(e.target.value)} />
+                  <input className="border rounded-xl px-3 py-2 text-sm" placeholder="📍 Address" value={editAddress} onChange={e => setEditAddress(e.target.value)} />
+                  <input className="border rounded-xl px-3 py-2 text-sm" placeholder="✉️ Business Email" value={editEmail} onChange={e => setEditEmail(e.target.value)} />
+                  <input className="border rounded-xl px-3 py-2 text-sm" placeholder="🌐 Website" value={editWebsite} onChange={e => setEditWebsite(e.target.value)} />
+                  <div className="flex gap-2 mt-1">
+                    <button onClick={() => saveEdit(l.id)} className="rounded-xl px-4 py-1.5 text-sm font-medium text-zinc-800" style={{ backgroundColor: "#F5D87A" }}>Save</button>
+                    <button onClick={() => setEditingId(null)} className="rounded-xl px-4 py-1.5 text-sm font-medium bg-zinc-200 text-zinc-700">Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {l.contact_info && <div className="text-sm text-zinc-600">📞 {l.contact_info}</div>}
+                  {l.address && <div className="text-sm text-zinc-600">📍 {l.address}</div>}
+                  {l.business_email && <div className="text-sm text-zinc-600">✉️ {l.business_email}</div>}
+                  {l.website && <div className="text-sm text-zinc-600">🌐 {l.website}</div>}
+                  <button onClick={() => startEdit(l)} className="self-start mt-1 rounded-xl px-3 py-1 text-xs font-medium bg-zinc-100 text-zinc-600 border">Edit Info</button>
+                </>
+              )}
             </div>
           ))}
         </div>
