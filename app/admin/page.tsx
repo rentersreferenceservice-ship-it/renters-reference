@@ -74,12 +74,22 @@ export default function AdminPage() {
 
   async function fetchLandlords() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("landlords")
-      .select("*")
-      .order("name");
-    if (error) setMessage(`Error: ${error.message}`);
-    setLandlords(data ?? []);
+    const allLandlords: Landlord[] = [];
+    const batchSize = 1000;
+    let from = 0;
+    while (true) {
+      const { data, error } = await supabase
+        .from("landlords")
+        .select("*")
+        .order("name")
+        .range(from, from + batchSize - 1);
+      if (error) { setMessage(`Error: ${error.message}`); break; }
+      if (!data || data.length === 0) break;
+      allLandlords.push(...data);
+      if (data.length < batchSize) break;
+      from += batchSize;
+    }
+    setLandlords(allLandlords);
     setLoading(false);
   }
 
@@ -119,8 +129,10 @@ export default function AdminPage() {
 
   const filtered = landlords
     .filter(l => showAll || hasPendingInfo(l))
-    .filter(l => l.name.toLowerCase().includes(search.toLowerCase()) ||
-      l.city?.toLowerCase().includes(search.toLowerCase()));
+    .filter(l => {
+      const q = search.toLowerCase();
+      return !q || l.name?.toLowerCase().includes(q) || l.city?.toLowerCase().includes(q) || l.state?.toLowerCase().includes(q);
+    });
 
   const pendingCount = landlords.filter(l => hasPendingInfo(l) && !l.verified).length;
 
@@ -140,7 +152,7 @@ export default function AdminPage() {
       <div className="flex gap-3 mb-4">
         <input
           className="flex-1 border rounded-xl px-4 py-2 text-sm"
-          placeholder="Search by name or city..."
+          placeholder="Search by name, city, or state..."
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
