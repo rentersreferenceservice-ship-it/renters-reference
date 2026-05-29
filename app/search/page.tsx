@@ -543,7 +543,7 @@ async function submitVerification(landlordId: string) {
               className="rounded-xl px-4 py-2 text-sm text-zinc-800" style={{ backgroundColor: "#F5D87A" }}
               onClick={() => { setClaimModalOpen(true); setClaimSearch(""); }}
             >
-              Landlords: Claim Your Profile
+              Landlords: Verify Your Business Profile
             </button>
           </div>
         </div>
@@ -553,7 +553,7 @@ async function submitVerification(landlordId: string) {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
             <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl mx-4">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Claim Your Profile</h2>
+                <h2 className="text-lg font-semibold">Verify Your Business Profile</h2>
                 <button className="text-zinc-400 hover:text-zinc-700 text-xl leading-none" onClick={() => setClaimModalOpen(false)}>✕</button>
               </div>
 
