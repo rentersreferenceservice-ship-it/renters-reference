@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 type Landlord = {
   id: string;
@@ -37,7 +39,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     async function init() {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await getSupabase().auth.getSession();
       if (!session) {
         router.replace("/login?redirect=/admin");
         return;
@@ -78,7 +80,7 @@ export default function AdminPage() {
     const batchSize = 1000;
     let from = 0;
     while (true) {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from("landlords")
         .select("*")
         .order("name")
