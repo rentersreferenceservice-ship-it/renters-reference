@@ -414,20 +414,28 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 const { error } = await supabase
-  .from("reports")
+  .from('reports')
   .insert({
     landlord_id: landlordId,
     rating: overallRating,
     report_text: note.trim(),
+    repair_speed: repairSpeed,
+    deposit_return: depositReturn,
+    allows_pets: allowsPets,
+    heat_included: heatIncluded,
+    utilities_included: utilitiesIncluded,
+    confirmed_rented: confirmedRented,
   });
 
 if (error) {
-  console.error("Supabase insert error:", error);
+  alert('There was an error saving your report. Please try again.');
+  console.error('Supabase insert error:', error);
+  return;
 }
- setReports((prev) => [newReport, ...prev]);
+setReports((prev) => [newReport, ...prev]);
 
 resetForms();
-setOverallRating(0); // or whatever your “empty” rating should be
+setOverallRating(5);
 
 setSelectedLandlordId(landlordId);
 setView("list");

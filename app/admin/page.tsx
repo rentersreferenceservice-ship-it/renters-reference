@@ -50,6 +50,14 @@ export default function AdminPage() {
     init();
   }, []);
 
+  async function getAuthHeaders() {
+    const { data: { session } } = await getSupabase().auth.getSession();
+    return {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${session?.access_token ?? ""}`,
+    };
+  }
+
   function startEdit(l: Landlord) {
     setEditingId(l.id);
     setEditPhone(l.contact_info ?? "");
@@ -61,7 +69,7 @@ export default function AdminPage() {
   async function saveEdit(id: string) {
     const res = await fetch("/api/admin-update-landlord", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: await getAuthHeaders(),
       body: JSON.stringify({ landlordId: id, phone: editPhone, address: editAddress, email: editEmail, website: editWebsite }),
     });
     if (res.ok) {
@@ -98,7 +106,7 @@ export default function AdminPage() {
   async function verify(id: string) {
     const res = await fetch("/api/admin-verify", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: await getAuthHeaders(),
       body: JSON.stringify({ landlordId: id }),
     });
     if (res.ok) {
@@ -114,7 +122,7 @@ export default function AdminPage() {
   async function unverify(id: string) {
     const res = await fetch("/api/admin-verify", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: await getAuthHeaders(),
       body: JSON.stringify({ landlordId: id, unverify: true }),
     });
     if (res.ok) {
